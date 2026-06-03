@@ -1,0 +1,3 @@
+# Example: Results To Prose
+
+In the current Tier B comparison set, the three species showed clear differences in mutation burden and mutation composition. Microbe, rice, and pig retained 673, 10,076, and 23,951 variants, respectively, corresponding to 2.24, 100.76, and 4,790.2 variants per sample. Microbe and rice were dominated by SNPs, whereas pig showed a much higher InDel fraction. The Ti/Tv ratio was also markedly different across species, with microbe showing the highest value. These results indicate that the present comparison set captures stable cross-species differences in retained mutation profile, although the interpretation should remain cautious because genome-size normalization was not applied in this round.

@@ -1,0 +1,10 @@
+记一下这个分析
+生成 provenance
+生成溯源文档
+帮我创建复现文档
+封版
+seal version
+create provenance for this analysis
+归档当前结果
+为 v1.3.2 写溯源文档
+provenance for analysis/foo

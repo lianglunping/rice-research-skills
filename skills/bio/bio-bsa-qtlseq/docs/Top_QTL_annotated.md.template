@@ -1,0 +1,83 @@
+# Top 候选 QTL 注释表（客户快速查阅）
+
+> 数据源: `results/main/Gprime_q005_regions.tsv` + `results/main/QTLseq_ci95_regions.tsv` + `results/main/*_candidate_genes.tsv`
+> 方向约定: `+ΔSNP` = HighBulk (抗旱池) 富集 Va-like 等位 / `−ΔSNP` = 富集 Vv-like 等位（仅统计符号，**未做生物学验证**）
+
+## 🌟 主候选（Top 6 精细化 QTL，QTLseq 95% CI）
+
+以 `uniq -c QTLseq_ci95_regions_candidate_genes.tsv` 实测候选基因数（非估计）：
+
+| Rank | QTL ID | Chr | 区间 (bp) | 长度 (bp) | peakΔSNP | 方向 | 候选基因数 | meanΔSNP | 建议 |
+|------|--------|-----|-----------|-----------|----------|------|-----------|----------|------|
+| 1 ⭐ | QTLseq_6 | chr5 | 23,199,401 – 25,021,533 | 1,822,132 | **+0.302** | Va 富集 | **176** | +0.283 | 最高优先，做 GO/KEGG + KASP |
+| 2 | QTLseq_4 | chr14 | 23,172,819 – 24,651,223 | 1,478,404 | +0.266 | Va 富集 | **110** | +0.259 | 优先验证 |
+| 3 | QTLseq_5 | chr3 | 1,594,713 – 2,647,106 | 1,052,393 | +0.262 | Va 富集 | **138** | +0.256 | 窄区间，优先 |
+| 4 | QTLseq_1 | chr12 | 1,407,321 – 3,408,933 | 2,001,612 | **−0.263** | Vv 富集 | **170** | −0.248 | Vv 反向贡献，需生物学验证 |
+| 5 | QTLseq_2 | chr12 | 3,644,509 – 3,709,142 | **64,633** | **−0.238** | Vv 富集 | **13** | −0.237 | 🔎 **最窄**，适合优先做标记验证与候选基因功能筛选 |
+| 6 | QTLseq_3 | chr13 | 5,219,608 – 5,498,302 | 278,694 | +0.246 | Va 富集 | **22** | +0.242 | 第二窄，可直接筛 |
+
+**Top 6 合计 629 基因-区间命中**（region 不重叠, unique VIT_ID 亦为 629）
+
+## Gprime q=0.05 的 20 候选区间 (FDR 5%)
+
+详见 `results/main/Gprime_q005_regions.tsv`，按 `maxGprime` 排序的 Top 10：
+
+| Rank | QTL ID | Chr | 区间 (Mb) | 长度 (Mb) | maxGprime | peakΔSNP | meanQval | Tier | 候选基因 |
+|------|--------|-----|-----------|-----------|-----------|----------|----------|------|----------|
+| 1 ⭐ | qtl16 | chr5 | 19.33–25.02 | 5.69 | **50.04** | +0.302 | 0.0192 | **A** | 445 |
+| 2 | qtl7 | chr12 | 0.41–4.93 | 4.52 | 35.32 | −0.263 | 0.0190 | **A** | 356 |
+| 3 | qtl9 | chr14 | 22.15–25.32 | 3.18 | 35.29 | +0.266 | 0.0203 | **A** | 262 |
+| 4 | qtl14 | chr3 | 0.84–3.44 | 2.60 | 32.37 | +0.262 | 0.0207 | **A** | 343 |
+| 5 | qtl8 | chr13 | 3.81–6.73 | 2.92 | 30.43 | +0.246 | 0.0246 | **A** | 233 |
+| 6 | qtl10 | chr15 | 13.54–17.74 | 4.19 | 25.80 | +0.226 | 0.0261 | B | 391 |
+| 7 | qtl5 | chr11 | 0.01–11.15 | **11.14** | 24.89 | +0.231 | 0.0240 | ⚠️ 剔除 | 856 |
+| 8 | qtl1 | chr1 | 0.002–2.01 | 2.00 | 23.39 | −0.216 | 0.0272 | B | 216 |
+| 9 | qtl13 | chr2 | 1.02–4.42 | 3.40 | 23.22 | +0.221 | 0.0281 | B | 399 |
+| 10 | qtl3 | chr1 | 22.30–23.04 | 0.73 | 23.09 | +0.210 | 0.0327 | B | 72 |
+
+### Tier 分级定义（按 `meanQval`）
+
+**A 级 (meanQval < 0.025, 6 个)**: qtl16, qtl7, qtl9, qtl14, qtl5(chr11), qtl8
+- 其中 **qtl5(chr11) 虽 meanQval=0.0240 达 A 级**，但在 QTLseq 95% CI 方法下未获独立支持（11.16 Mb 宽峰 ≠ 精细化 QTL），**建议作为例外从候选列表剔除**（详见 `02_LIMITATIONS.md §4.2`）
+- **实质可用 A 级 = 5 个**（除 chr11 qtl5）
+
+**B 级 (0.025 ≤ meanQval < 0.035, 12 个)**: qtl10, qtl1, qtl13, qtl18(chr6), qtl2(chr1), qtl12(chr18), qtl15(chr5), qtl20(chr8), qtl3, qtl11(chr16), qtl4(chr10), qtl19(chr7)
+
+**C 级 (0.035 ≤ meanQval ≤ 0.05, 2 个)**: qtl17(chr6), qtl6(chr11)
+
+> 注: `qtl` 编号是 QTLseqr 内部按染色体遍历顺序分配的编号（跨染色体可能跳跃），**与 maxGprime 排名无关**；跨阈值对比时请用 `(CHROM, start, end)` 作为区间身份，不要用 qtl 编号。详见 `03_COLUMN_DEFINITIONS.md`。
+
+## 方向分布（独立验证通过）
+
+- **Va 富集** (+ΔSNP): **12 / 20 = 60%**（主方向，与抗旱亲本统计一致）
+- **Vv 富集** (−ΔSNP): **8 / 20 = 40%**（多基因性状常见，chr12 两个 QTLseq CI 区间属此类）
+
+Va/Vv 方向仅为统计约定，不代表实际基因功能方向；需生物学验证。
+
+## 建议下游工作流
+
+详细操作指南见 `HOWTO_GO_KEGG.md`。高层步骤：
+
+```
+Step 1 (必做): GO/KEGG 功能富集
+  Input:  results/main/QTLseq_ci95_regions_candidate_genes.tsv (Top 6, 629 基因命中)
+          或 results/main/Gprime_q005_regions_candidate_genes.tsv (q005, 5,710 基因)
+  Tool:   eggNOG-mapper / gProfiler web / Phytozome annotation_info.txt
+  参考:   HOWTO_GO_KEGG.md §1-3
+  Output: 富集通路 + ABA/气孔/DREB 相关基因列表
+
+Step 2 (必做): 葡萄已知抗旱基因 sanity check
+  Input:  Top 6 候选基因 VIT_ID + VvDREB/VvMYB60/VvNCED3 坐标
+  参考:   HOWTO_GO_KEGG.md §4
+  Output: 已知抗旱基因与 QTL 重叠情况
+
+Step 3 (推荐): KASP 标记精细定位
+  Target: QTLseq_2 (chr12:3.64-3.71 Mb, 64 kb 最窄) 优先
+          QTLseq_6 (chr5:23.2-25.0 Mb) 作为最强信号
+  Tool:   Primer3 + 扩大 F2 群体 (n ≥ 150)
+
+Step 4 (可选): RNA-seq 差异表达
+  用 F2 极端个体 × 胁迫/对照，做 eQTL 与 BSA QTL 交集
+```
+
+返回 `00_README.md`

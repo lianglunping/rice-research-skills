@@ -1,0 +1,119 @@
+# ============================================================
+# IMPORTANT — lint_template.py contract:
+#
+# Tokens 2 chars or shorter (M1, M2, GT, DP, AD, GQ, FS, SOR, etc.)
+# MUST be matched with WORD-BOUNDARY regex \bTOKEN\b
+# to avoid false positives ("M1 cache", "GT model", "filesystem").
+#
+# Tokens 3 chars or longer (carrier_family, INFERRED_NON, etc.)
+# MAY use plain substring match.
+#
+# Section "Mutation-type metrics" (transition / transversion):
+# These have known false-positive risk in §7 version-evolution
+# narrative. lint_template.py MAY scope these bans to claim tables only.
+# ============================================================
+
+# ============================================================
+# Banned terms in core templates (full.md.j2 / lite.md.j2)
+# Spec §4.3. lint_template.py uses fixed-string grep.
+# Items here MUST NOT appear in core templates or references/*.md.
+# Domain-specific terms must live in extension_sections only.
+# ============================================================
+
+# --- Generation labels (rice mutagenesis specific) ---
+M1
+M2
+m1
+m2
+
+# --- Carrier/non-carrier statistics ---
+carrier_family
+n_carrier_M1
+n_carrier_M2
+n_noncarrier_M1
+n_noncarrier_M2
+n_gray_M1
+n_gray_M2
+n_missing_M1
+n_missing_M2
+
+# --- M2-specific column types ---
+M2_Variant_Type
+M2_VAF_Category
+
+# --- VCF / variant calling field names ---
+Variant_type
+INDEL_length
+Variant_Location
+site_flags
+
+# --- Sample-state enums ---
+INFERRED_NON
+MISSING
+GRAY
+NON
+CARRIER
+
+# --- VCF FORMAT/INFO fields ---
+GT
+DP
+AD
+AD_alt
+VAF
+GQ
+QD
+FS
+SOR
+
+# --- Filter-set names ---
+Strict
+Candidate
+strict
+candidate
+Strict_集
+Candidate_集
+
+# --- Mutation-type metrics ---
+Ti/Tv
+transition
+transversion
+
+# --- Reference / database names (rice-specific) ---
+8022
+NIP
+MSU
+IRGSP
+3K
+3K-RGP
+RiceVarMap
+ANNOVAR
+GFF3
+refGene
+GeneDetail
+LOC_Os
+MSU IRGSP-1.0
+
+# --- Tool names that should not be hardcoded in core ---
+fastp
+bwa-mem2
+GATK
+HaplotypeCaller
+GenotypeGVCFs
+Parabricks
+sambamba
+cyvcf2
+pysam
+
+# --- Family / sample IDs (rice mutagenesis) ---
+CM2-3
+CM2-8
+CM2-13
+CM2-21
+CM2-27
+CM2-34
+CM2-36
+CM2-37
+H1
+H2
+X1
+X2

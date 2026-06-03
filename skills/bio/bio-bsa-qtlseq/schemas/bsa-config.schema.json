@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bsa-qtlseq/schemas/bsa-config.schema.json",
+  "title": "BSA Project Configuration",
+  "description": "bsa.yaml 项目配置校验 schema (v2.1)。用 scripts/validate_config.py 调用",
+  "type": "object",
+  "required": ["project", "species", "reference", "variant_source", "population", "phenotype", "pipeline", "output"],
+  "additionalProperties": false,
+  "properties": {
+    "project": {
+      "type": "object",
+      "required": ["id", "contact"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
+          "description": "项目标识, 字母开头, 下划线或连字符"
+        },
+        "description": { "type": "string" },
+        "contact": { "type": "string" }
+      }
+    },
+    "species": {
+      "type": "object",
+      "required": ["name", "ploidy"],
+      "properties": {
+        "name": { "type": "string", "examples": ["Vitis vinifera", "Oryza sativa"] },
+        "common_name": { "type": "string" },
+        "ploidy": { "type": "integer", "minimum": 1, "maximum": 8 }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "required": ["assembly_id", "fa_path", "gff3_path", "chrom_list"],
+      "properties": {
+        "assembly_id": { "type": "string" },
+        "fa_path": { "type": "string", "description": "参考基因组 fasta 相对/绝对路径" },
+        "gff3_path": { "type": "string" },
+        "annotation_source": { "type": "string", "examples": ["Phytozome_v13", "Ensembl Plants", "NCBI RefSeq"] },
+        "chrom_regex": {
+          "type": "string",
+          "description": "从 .fai 生成 chrom_list 的正则；生成后 chrom_list 为真值"
+        },
+        "chrom_list": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "QTLseqr 只读此字段；必须与 .fai 中 contig 名一致"
+        },
+        "gene_feature_type": {
+          "type": "string",
+          "default": "gene",
+          "description": "GFF3 第 3 列中基因类型"
+        },
+        "gene_id_regex": {
+          "type": "string",
+          "default": "ID=([^;]+)",
+          "description": "从 GFF3 第 9 列提取 gene ID 的正则"
+        },
+        "gene_id_prefix": {
+          "type": "string",
+          "description": "仅文档示例用，不参与解析",
+          "x-doc-only": true
+        }
+      }
+    },
+    "variant_source": {
+      "type": "object",
+      "required": ["caller", "cohort_vcf"],
+      "properties": {
+        "caller": { "enum": ["DeepVariant", "GATK", "bcftools", "other"] },
+        "caller_model": { "type": "string", "examples": ["WGS", "WES", "HC_GVCF"] },
+        "cohort_vcf": { "type": "string" },
+        "cohort_samples_total": { "type": "integer", "minimum": 1 },
+        "genotype_mode": { "enum": ["joint-call", "individual", "pooled"] }
+      }
+    },
+    "population": {
+      "type": "object",
+      "required": ["type", "parents", "bulk_size"],
+      "properties": {
+        "type": { "enum": ["F2", "BC1", "BC2", "BC3", "RIL", "F3", "F4", "F5", "other"] },
+        "parents": {
+          "type": "object",
+          "required": ["high_source", "low_source"],
+          "properties": {
+            "high_source": { "type": "string", "description": "高表型亲本样本名（cohort VCF 中）" },
+            "low_source": { "type": "string" }
+          }
+        },
+        "bulk_size": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 10 },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "[HighBulk, LowBulk] 个体数；<20 会触发 LIMITATIONS 警告"
+        }
+      }
+    },
+    "phenotype": {
+      "type": "object",
+      "required": ["phenotype_file", "phenotype_unit", "bulk_selection_rule"],
+      "oneOf": [
+        { "required": ["phenotype_value_column"] },
+        { "required": ["phenotype_rank_column"] }
+      ],
+      "properties": {
+        "phenotype_file": { "type": "string" },
+        "phenotype_value_column": { "type": "string" },
+        "phenotype_rank_column": { "type": "string" },
+        "phenotype_unit": { "type": "string" },
+        "phenotype_timepoint": {
+          "type": "string",
+          "description": "多时间点时必填, 如 3h/5h/24h"
+        },
+        "phenotype_batch": {
+          "type": "string",
+          "description": "多批次时必填, 如 2026_spring"
+        },
+        "bulk_selection_rule": {
+          "type": "string",
+          "examples": ["top-20 by value", "tail-10% by rank", "threshold >= 0.3"]
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "properties": {
+        "conda_env": { "type": "string", "default": "bsa" },
+        "cpu": { "type": "integer", "minimum": 1, "default": 16 },
+        "ram_gb": { "type": "integer", "minimum": 8, "default": 32 }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "required": ["filterSNPs", "Gprime", "QTLseq", "thresholds"],
+      "properties": {
+        "filterSNPs": {
+          "type": "object",
+          "properties": {
+            "refAlleleFreq": { "type": "number", "minimum": 0, "maximum": 0.5, "default": 0.20 },
+            "minTotalDepth": { "type": "integer", "minimum": 1, "default": 40 },
+            "maxTotalDepth": { "type": "integer", "minimum": 100, "default": 600 },
+            "minSampleDepth": { "type": "integer", "minimum": 1, "default": 15 },
+            "minGQ": { "type": "integer", "default": 0, "description": "池合并后 GQ 为占位值 99, minGQ=0 等于禁用" },
+            "depthDifference": { "type": "integer", "default": 100 }
+          }
+        },
+        "Gprime": {
+          "type": "object",
+          "properties": {
+            "windowSize": { "type": "integer", "default": 1000000 },
+            "outlierFilter": { "enum": ["deltaSNP", "Hampel"], "default": "deltaSNP" },
+            "filterThreshold": { "type": "number", "default": 0.1 }
+          }
+        },
+        "QTLseq": {
+          "type": "object",
+          "properties": {
+            "replications": { "type": "integer", "default": 10000 },
+            "intervals": {
+              "type": "array",
+              "items": { "type": "integer" },
+              "default": [95, 99]
+            },
+            "seed": { "type": "integer", "default": 42 }
+          }
+        },
+        "sensitivity": {
+          "type": "object",
+          "properties": {
+            "window_500kb": { "type": "boolean", "default": true },
+            "refAF_035": { "type": "boolean", "default": true }
+          }
+        },
+        "thresholds": {
+          "type": "object",
+          "properties": {
+            "Gprime": {
+              "type": "array",
+              "items": { "type": "number" },
+              "default": [0.01, 0.05],
+              "description": "[preplanned, fallback]"
+            },
+            "QTLseq": {
+              "type": "array",
+              "items": { "type": "integer" },
+              "default": [99, 95]
+            }
+          }
+        },
+        "allow_fallback": {
+          "type": "boolean",
+          "default": true,
+          "description": "降档时强制生成 fallback_rationale.md"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["release_version", "formats"],
+      "properties": {
+        "release_version": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$" },
+        "formats": {
+          "type": "array",
+          "items": { "enum": ["pdf", "png"] },
+          "minItems": 2,
+          "contains": { "const": "pdf" }
+        },
+        "png_dpi": { "type": "integer", "minimum": 600, "default": 600 },
+        "pdf_font_embed": { "type": "boolean", "default": true },
+        "figure_pair_check": { "type": "boolean", "default": true },
+        "bundle": { "enum": ["tar.gz", "zip", "none"], "default": "tar.gz" },
+        "sign_with": {
+          "type": "array",
+          "items": { "enum": ["md5", "sha256"] },
+          "default": ["md5", "sha256"]
+        }
+      }
+    }
+  }
+}

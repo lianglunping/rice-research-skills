@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bio Review Paper Reading"
+  short_description: "Review framework, gaps, and research seeds"
+  default_prompt: "Use $bio-review-paper-reading to reconstruct a review article's field framework, controversies, gaps, and research seeds."

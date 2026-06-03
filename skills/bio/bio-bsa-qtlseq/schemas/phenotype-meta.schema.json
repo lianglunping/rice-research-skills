@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bsa-qtlseq/schemas/phenotype-meta.schema.json",
+  "title": "Phenotype Source Metadata",
+  "description": "phenotype_source.meta.yaml - 客户提供表型原始元数据的摘要",
+  "type": "object",
+  "required": ["file", "description", "provided_by"],
+  "properties": {
+    "file": { "type": "string" },
+    "description": { "type": "string" },
+    "provided_by": { "type": "string" },
+    "received_date": { "type": "string", "format": "date" },
+    "measurement_method": {
+      "type": "string",
+      "description": "如 '叶片离体称重 / 烘干法 / 重量差分'"
+    },
+    "unit": { "type": "string" },
+    "replicates": { "type": "integer", "minimum": 1 },
+    "measurement_environment": {
+      "type": "object",
+      "properties": {
+        "temperature_C": { "type": "number" },
+        "humidity_percent": { "type": "number" },
+        "light_condition": { "type": "string" }
+      }
+    },
+    "measured_by": { "type": "string" },
+    "measurement_date": { "type": "string", "format": "date" },
+    "timepoint": { "type": "string", "description": "如 3h / 5h / 24h 胁迫后时间" },
+    "batch": { "type": "string", "description": "季节/年份批次" },
+    "notes": { "type": "string" }
+  }
+}

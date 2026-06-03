@@ -1,0 +1,19 @@
+interface:
+  display_name: "Job Monitor Loop"
+  short_description: "Monitor long jobs with staged backoff."
+  default_prompt: "Use $job-monitor-loop to monitor this long-running job with staged backoff and evidence-based anomaly reports."
+version: "0.2.0"
+keywords:
+  - "monitor"
+  - "loop"
+  - "long-running"
+  - "backoff"
+  - "anomaly"
+  - "tmux"
+  - "wrapper.sh"
+  - "RUN_ID"
+  - "bioinformatics"
+tags:
+  - "Development"
+  - "Monitoring"
+  - "Bioinformatics"

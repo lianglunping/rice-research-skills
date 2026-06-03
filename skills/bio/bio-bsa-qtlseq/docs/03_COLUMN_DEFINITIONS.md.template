@@ -1,0 +1,129 @@
+# 结果文件列定义字典
+
+本文档说明 release 中所有 TSV 文件的列含义，帮助客户正确解读。
+
+---
+
+## 1. `Gprime_q005_regions.tsv` / `Gprime_q001_regions.tsv` (Gprime QTL 区间表)
+
+QTLseqr `getQTLTable(method='Gprime', alpha=X)` 原生输出，17 列：
+
+| 列名 | 类型 | 说明 |
+|------|------|------|
+| CHROM | string | 染色体 ID (`chr1`–`chr19`) |
+| qtl | int | **QTLseqr 内部编号**（按染色体遍历顺序分配, **与 maxGprime 排名无关**；跨阈值对比请用 CHROM/start/end 作为身份） |
+| start | int | 区间左边界 (bp, 1-based, 闭区间) |
+| end | int | 区间右边界 (bp) |
+| length | int | `end - start` (bp) |
+| nSNPs | int | 区间内参与 G' 计算的 SNP 总数 |
+| avgSNPs_Mb | int | 区间每 Mb 平均 SNP 密度 (`nSNPs / length * 1e6`) |
+| peakDeltaSNP | float | 区间内单窗口 ΔSNP-index 最大**绝对值**（带符号, + 表示 HighBulk 富集 Va-like 等位） |
+| posPeakDeltaSNP | int | `peakDeltaSNP` 对应的窗口位置 (bp) |
+| avgDeltaSNP | float | 区间内 ΔSNP-index 均值（带符号） |
+| maxGprime | float | 区间内 G' 最大值（Magwene et al. 2011 tricube 平滑统计量） |
+| posMaxGprime | int | `maxGprime` 对应的窗口位置 (bp) **可能 ≠ posPeakDeltaSNP** |
+| meanGprime | float | 区间 G' 均值 |
+| sdGprime | float | 区间 G' 标准差 |
+| AUCaT | float | Area Under Curve above Threshold（区间内 G' 超过阈值部分的曲线下面积；综合质量指标） |
+| meanPval | float | 区间 G' permutation p-value 均值 |
+| meanQval | float | BH (Benjamini-Hochberg) FDR 调整后的 q-value 均值 ← **客户用此值判断显著性** |
+
+**Tier 分级参考**（在 `Top_QTL_annotated.md` 使用）:
+- A 级: meanQval < 0.025 (6 个, 含 chr11 qtl5 但建议剔除)
+- B 级: 0.025 ≤ meanQval < 0.035 (12 个)
+- C 级: 0.035 ≤ meanQval ≤ 0.05 (2 个)
+
+---
+
+## 2. `QTLseq_ci95_regions.tsv` / `QTLseq_ci99_regions.tsv` (QTL-seq CI 区间表)
+
+QTLseqr `getQTLTable(method='QTLseq', interval=X)` 原生输出，10 列（**比 Gprime 少 7 列**：无 Gprime/pval/qval，因 QTL-seq 基于 simulation CI 而非 p-value）：
+
+| 列名 | 类型 | 说明 |
+|------|------|------|
+| CHROM | string | 染色体 ID |
+| qtl | int | QTLseqr 内部编号（与 Gprime 的编号**独立, 不可互查**） |
+| start | int | 区间左边界 (bp) |
+| end | int | 区间右边界 (bp) |
+| length | int | 区间长度 |
+| nSNPs | int | 区间内 SNP 数 |
+| avgSNPs_Mb | int | SNP 密度 |
+| peakDeltaSNP | float | 区间 ΔSNP-index 最大绝对值（带符号） |
+| posPeakDeltaSNP | int | 峰值位置 |
+| avgDeltaSNP | float | 区间 ΔSNP-index 均值 |
+
+**显著性判定**: QTL-seq 方法通过 10,000 次 bootstrap simulation 生成置信带（95%/99% CI）。超出置信带 = 显著。本分析 `intervals=c(95,99)`, `replications=10000`, `set.seed(42)`。
+
+---
+
+## 3. `*_regions_candidate_genes.tsv` (候选基因注释表)
+
+`bedtools intersect -a regions.bed -b genes.bed -wa -wb` 原生输出，**无表头，8 列**：
+
+| 列号 | 列名 | 类型 | 说明 |
+|------|------|------|------|
+| 1 | region_chr | string | QTL 区间染色体 |
+| 2 | region_start | int | QTL 区间起始（BED 0-based） |
+| 3 | region_end | int | QTL 区间结束 |
+| 4 | region_label | string | **区间标签**：`qtl{N}_dSNP{peak}_posPeakdSNP{pos}` 或 `qtl{N}_Gp{max}_dSNP{peak}_posMaxGp{pos}_posPeakdSNP{pos}` |
+| 5 | gene_chr | string | 基因所在染色体（应与 region_chr 一致） |
+| 6 | gene_start | int | 基因起始（BED 0-based） |
+| 7 | gene_end | int | 基因结束 |
+| 8 | gene_id | string | VIT ID，如 `VIT_205s0049g00570.v2.1` |
+
+**过滤示例**（chr5 qtl6 的基因）:
+```bash
+awk '$4 ~ /^qtl6/' QTLseq_ci95_regions_candidate_genes.tsv | cut -f8 | sort -u
+```
+
+**每 QTL 基因数**（QTLseq_ci95, Top 6）:
+```
+qtl1 (chr12:1.4-3.4 Mb)   170 unique
+qtl2 (chr12:3.6-3.7 Mb)    13 unique
+qtl3 (chr13:5.2-5.5 Mb)    22 unique
+qtl4 (chr14:23.2-24.7 Mb) 110 unique
+qtl5 (chr3:1.6-2.6 Mb)    138 unique
+qtl6 (chr5:23.2-25.0 Mb)  176 unique
+------
+total                     629 unique (区间互不重叠)
+```
+
+---
+
+## 4. `SUMMARY_v2.md` (机器生成汇总)
+
+v2.1 修复后含完整 **4×3 敏感性矩阵**:
+
+| 参数 | Gprime q001 | Gprime q005 | QTLseq ci99 | QTLseq ci95 |
+|------|-------------|-------------|-------------|-------------|
+| 主 (window=1e6, refAF=0.20) | 0 | 20 | 0 | 6 |
+| w500kb (window=5e5) | 23 | 42 | 0 | 18 |
+| rf035 (refAF=0.35) | 0 | 19 | 1 | 7 |
+
+**注意 (审计修复 C3)**:
+- w500k q001=23 vs 主 0 —— 窗口缩小时 permutation null 分布尾部变厚，阈值更易触及。**不代表主分析保守**。
+- w500k ci95=18 vs 主 6 —— 窗口变窄导致 CI 带宽变小，更多区间通过。敏感性分析结果应与主分析独立解读。
+- 详细解释见 `02_LIMITATIONS.md §3.5`。
+
+---
+
+## 5. `samples.tsv`
+
+7 列（含 phenotype_source 列）:
+
+| 列名 | 说明 |
+|------|------|
+| sample_id | cohort VCF 中的样本名 |
+| bulk | HighBulk / LowBulk / parent |
+| role | 抗旱个体 / 不抗个体 / 抗旱亲本 / 不抗亲本 |
+| phenotype | resistant / susceptible |
+| phenotype_source | 指向 phenotype_source.meta.yaml |
+| vcf_match | yes（经 bcftools query -l 验证全部匹配） |
+| note | 说明 |
+
+---
+
+## 6. BED 文件命名约定（仅在 scripts 生成的中间文件）
+
+- `{METHOD}_regions.bed`: 4 列 BED `chr start end label`
+- `genes.bed`: 4 列 BED `chr start end gene_id`（从 Vvinifera_457_v2.1.gene.gff3 的 `gene` feature 提取）

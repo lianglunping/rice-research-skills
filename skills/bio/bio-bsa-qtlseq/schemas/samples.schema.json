@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bsa-qtlseq/schemas/samples.schema.json",
+  "title": "Samples TSV Schema (validated row-by-row)",
+  "description": "metadata/samples.tsv 每行 = 一个 JSON 对象通过本 schema 校验",
+  "type": "object",
+  "required": ["sample_id", "bulk", "role", "vcf_match"],
+  "oneOf": [
+    { "required": ["phenotype_value"] },
+    { "required": ["phenotype_rank"] }
+  ],
+  "properties": {
+    "sample_id": { "type": "string" },
+    "bulk": { "enum": ["HighBulk", "LowBulk", "parent", "exclude"] },
+    "role": {
+      "type": "string",
+      "examples": ["抗旱个体", "不抗个体", "抗旱亲本", "不抗亲本", "high_individual", "low_individual", "high_source", "low_source"]
+    },
+    "phenotype_value": {
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string", "pattern": "^(NA|N/A|-)?$" }
+      ]
+    },
+    "phenotype_rank": {
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "string", "pattern": "^(NA|-)?$" }
+      ]
+    },
+    "phenotype_source": { "type": "string" },
+    "vcf_match": { "enum": ["yes", "no"] },
+    "note": { "type": "string" }
+  }
+}

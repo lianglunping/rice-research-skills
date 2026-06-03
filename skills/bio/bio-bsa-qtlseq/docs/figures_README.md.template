@@ -1,0 +1,154 @@
+# Figures 目录 — 图表解读指南
+
+本目录含 14 个 PDF，分 5 类曼哈顿/诊断图 × 3 组参数（主 + 2 套敏感性）。
+
+## 命名约定
+
+```
+{序号}_{图类型}[_{参数后缀}].pdf
+
+序号:
+  00 = 诊断图 (分布检视, 在 QTLseqr filterSNPs 之前生成)
+  01-04 = 主要结果图 (基于 filterSNPs 后的 SNP)
+
+参数后缀:
+  （无）     主分析: window=1Mb, refAlleleFreq=0.20
+  _w500k     敏感性 1: window=500kb, refAlleleFreq=0.20  (用于诊断 chr11 qtl5 宽峰)
+  _rf035     敏感性 2: window=1Mb, refAlleleFreq=0.35 (QTLseqr vignette 默认)
+```
+
+> 注: `00_diagnostic_rf035.pdf` **不存在**（诊断图在 filterSNPs 之前生成，与 refAF 无关，故与 `00_diagnostic.pdf` 完全相同，已去重）。
+
+---
+
+## 文件清单与解读
+
+### 00_diagnostic*.pdf — 数据分布诊断图（2 张）
+
+**用途**: 检查输入数据质量，决定 filterSNPs 阈值是否合理。
+
+**每个 PDF 含 5 页**:
+1. **Total depth (HIGH+LOW) 分布直方图**
+   - 用于设定 `minTotalDepth` / `maxTotalDepth` 过滤阈值
+   - **如何解读**: 主峰位置是典型覆盖度；若峰偏向低端（如 <40×）说明测序浅，filterSNPs 保留率会低；若分布长尾至 >600× 说明有重复区，应过滤
+2. **REF allele frequency 分布直方图**
+   - 用于评估 `refAlleleFreq` 过滤是否合理
+   - **如何解读**: 理论上 F2 混池中 REF freq 应接近 0.5 正态分布；若分布偏移或双峰说明群体结构或测序偏好
+3. **SNPindex HIGH bulk 分布**
+   - 观察 HighBulk 的 SNP-index 分布
+   - **如何解读**: 大部分位点应接近 0.5；极端值（0 或 1）是我们**期望**的 QTL 信号
+4. **SNPindex LOW bulk 分布**
+   - 同上，LowBulk 视角
+5. **DP equality HIGH vs LOW (hex plot, M3 pseudo-pool QC)**
+   - 两池深度散点, 点密度 hex 化
+   - **如何解读**: 理想情况沿对角线分布（两池深度匹配）；若偏离对角线严重则 pseudo-pool 假设受损（见 `02_LIMITATIONS.md §3.1`）
+
+---
+
+### 01_Gprime_manhattan*.pdf — G' 曼哈顿图（3 张）
+
+**用途**: **最常用的 QTL 可视化**。X 轴全基因组位置，Y 轴 Gprime (tricube 平滑 G 统计量)。
+
+**⚠️ 关于阈值线**:
+
+R 脚本调用 `plotQTLStats(var='Gprime', plotThreshold=TRUE, q=0.01)`。QTLseqr 的 `plotThreshold=TRUE` **仅在存在至少一个 window `meanQval < 0.01` 时才会绘制阈值线**；若没有任何窗口达到，函数静默省略该线。
+
+- `01_Gprime_manhattan.pdf` (主): **无阈值线** (主分析 q001 区间 = 0) → 所有峰均未达 q<0.01
+- `01_Gprime_manhattan_rf035.pdf`: **无阈值线** (rf035 下 q001 区间 = 0)
+- `01_Gprime_manhattan_w500k.pdf`: **有阈值线** (w500k 下 q001 区间 = 23, 阈值线可见); 但注意 w500k q001=23 属于窗口缩小导致 null 分布尾部变厚的**统计伪象**（见 `02_LIMITATIONS.md §3.5`），**不代表 w500k 分析更可信**
+
+> 如果图中看不到虚线 = 没有窗口通过 q<0.01 严格阈值；实际显著区间请查 `results/main/Gprime_q005_regions.tsv` (FDR 5%, 20 区间)。
+
+**如何解读**:
+- **峰高 = 信号强度**；绝对值最大的峰通常是主候选 QTL
+- **峰宽 = 连锁范围 / 分辨率**；宽峰（>5 Mb）提示小样本分辨率限制或 LD 块
+- **多峰染色体**: chr5 峰（位置 ~25 Mb, 全基因组最高）+ chr12/chr14/chr3 次级峰 = 主要候选
+- **与 `results/main/Gprime_q005_regions.tsv` 的对应**: TSV 中的每行对应图中一个连续超过 q=0.05 阈值的区间（q=0.05 阈值在图上**不直接可见**，因 plotQTLStats 只画 plotThreshold=TRUE 指定的 q=0.01；客户需从 TSV 中读取 20 个区间，对应图中可视峰）
+
+**3 张图对比使用**:
+- `01_Gprime_manhattan.pdf` (主): **这是交付的主图**，20 个 q=0.05 区间来自这里
+- `01_Gprime_manhattan_w500k.pdf`: chr11 区域展开为多个小峰，帮助诊断 11 Mb 宽峰真伪；也是**唯一有 q=0.01 阈值线**的图
+- `01_Gprime_manhattan_rf035.pdf`: 更严格 refAF 下 chr5 主信号仍最强 → 稳健性证据（chr5 峰值从 50.04 升至 54.50）
+
+---
+
+### 02_negLog10Pval_manhattan*.pdf — −log10(p-value) 曼哈顿图（3 张）
+
+**用途**: G' permutation p-value 的可视化（统计显著性视角）；与 01 是同一 G' 分析的不同 Y 轴表达。
+
+**如何解读**:
+- Y 轴 `-log10(p)` 越大越显著
+- **阈值线（q=0.01）** 的出现规则同 01 图：仅在主/rf035 下看不到（q001 区间=0），w500k 下可见
+- **通常与 01 图峰位一致，但峰高相对尺度不同**；02 图对极端位点更敏感（拉伸尾部）
+- 优先看 01 图识别候选；02 图作为显著性的二次确认
+
+---
+
+### 03_deltaSNP_manhattan*.pdf — ΔSNP-index 曼哈顿图（3 张）
+
+**用途**: QTL-seq 方法的核心视图。X 轴位置，Y 轴 ΔSNP-index（带符号），阴影为 95%/99% 置信区间。
+
+**如何解读**:
+- **+ΔSNP > 0**: HighBulk (抗旱池) 富集 Va-like 等位 → 符合抗旱亲本贡献
+- **−ΔSNP < 0**: HighBulk 贫化 Va-like → Vv 贡献该位点的抗旱等位（多基因性状常见）
+- **阴影带之外的点 = QTL-seq 显著**: 超过 95% CI 带的位点进入 `QTLseq_ci95_regions.tsv`；超过 99% 带的进 `QTLseq_ci99_regions.tsv`（主分析为 0）
+- **chr5 右端**: 最明显的 +0.30 峰值点，跨越 95% CI 带，对应 `QTLseq_ci95 qtl6` 精细化区间
+- **chr12**: 两处 −方向峰，对应 chr12 qtl1/qtl2（Vv 贡献）
+
+**3 张图对比**:
+- 主图: 6 个 ci95 区间对应图中跨出阴影带的峰
+- w500k: **阴影带变窄** → 更多点跨出 → ci95=18 区间（**统计伪象，不是真多出 12 个 QTL**，见 `02_LIMITATIONS.md §3.5`）
+- rf035: **ci99=1 区间**（主 0）→ 严格 refAF 下信噪比提升
+
+---
+
+### 04_nSNPs_per_window*.pdf — 每窗口 SNP 数分布（3 张）
+
+**用途**: **QC 图**，检查每个滑窗内 SNP 密度是否均匀。低密度窗会让 G' 统计不稳定。
+
+**如何解读**:
+- Y 轴是窗口内 SNP 计数；大部分应在 1000-5000 之间
+- **低密度窗口（<500）**: 往往位于着丝粒或重复区，G' 不可信
+- **高密度窗口（>10000）**: 可能是局部 SNP 富集或假 variant call
+- **主分析**: 窗口 1 Mb × 20,000 SNP/Mb ≈ 2 千 SNP/窗 的中位数
+- **w500k**: 窗口变窄 → nSNPs 减半 → null 分布方差增大（这是 w500k 下 q001 从 0 变 23 的原因）
+
+---
+
+## 典型客户解读流程
+
+1. **第一张看**: `01_Gprime_manhattan.pdf` (主) — 哪里有高峰？
+2. **精细化**: `03_deltaSNP_manhattan.pdf` (主) — 找跨出 95% CI 的峰 → 对应 Top 6
+3. **方向判断**: `03_deltaSNP_*` 的 +/− 符号 → Va 还是 Vv 贡献
+4. **稳健性验证**: 同位置在 3 张 `_rf035.pdf` 中是否仍为最强峰？
+5. **可疑区诊断**: chr11 的宽峰在 `*_w500k.pdf` 下是否细化？
+6. **数据质量**: `00_diagnostic.pdf` → DP 分布是否合理、两池 DP 是否对等
+7. **窗口可信度**: `04_nSNPs_per_window.pdf` → 候选峰所在窗是否足够 SNP 数
+
+---
+
+## 与结果 TSV 的交叉引用
+
+| 图类型 | 对应 TSV | 阈值线 (q=0.01) |
+|--------|----------|------------------|
+| 01 Gprime manhattan | `results/main/Gprime_q005_regions.tsv` (20 区间, FDR 5%); `Gprime_q001_regions.tsv` (主/rf035 为空, w500k 23 行) | 主/rf035 **无**; w500k **有** |
+| 02 negLog10Pval manhattan | 同 01 (不同 Y 轴表达) | 主/rf035 **无**; w500k **有** |
+| 03 deltaSNP manhattan (跨出阴影的点) | `results/main/QTLseq_ci95_regions.tsv` (6 区间) / `QTLseq_ci99_regions.tsv` (主/w500k 空; rf035 1 行) | 95/99% CI 阴影带 **总会绘制** |
+| 04 nSNPs_per_window | `Gprime_all_snps.tsv` 的 `nSNPs` 列 (该文件不在 release，在服务器) | — |
+
+> 阈值线可见性规则: QTLseqr `plotQTLStats(plotThreshold=TRUE, q=0.01)` **仅在至少一个窗口 meanQval<0.01 时**才绘制阈值线；本项目 Gprime q=0.01 区间计数见下表:
+>
+> | 参数 | q001 区间 | 阈值线 |
+> |------|-----------|--------|
+> | 主 | 0 | ✗ 无 |
+> | w500k | 23 | ✓ 有 |
+> | rf035 | 0 | ✗ 无 |
+
+---
+
+## 使用建议
+
+- **PDF 矢量图**，可无损放大查看；不建议转 PNG 展示（锯齿）
+- **科学汇报使用**: 直接截图 `01_Gprime_manhattan.pdf` + `03_deltaSNP_manhattan.pdf` 作为核心图
+- **内部复核使用**: 4 套诊断/QC 图全查
+- **需要定制图**（如仅 chr5 放大）: 读取 `results_v2/Gprime_all.rds` 后用 `QTLseqr::plotQTLStats(subset="chr5")` 重绘

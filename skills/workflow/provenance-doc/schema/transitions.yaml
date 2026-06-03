@@ -1,0 +1,95 @@
+# Machine-readable transition table for status_check.py
+# Maps to spec §6.3
+#
+# DESIGN NOTE: The state machine intentionally does NOT include a
+# `verified -> draft` reopen path. Structural edits (adding sections,
+# changing prose) on a `verified` doc are considered out-of-scope:
+# either add a new claim (`verified -> numbers-pending`) or seal and
+# create a new version. For sealed docs, use scripts/unseal_unsafe.py.
+#
+# The guard `all_value_have_command` is reused in two transitions
+# (draft -> verification-ready, numbers-pending -> verification-ready).
+# It evaluates the same predicate; status_check.py treats it identically
+# regardless of source state.
+
+# Metadata (used by tests/test_state_machine.py for self-validation
+# instead of len()-based asserts that drift silently when the table changes).
+schema_version: 1
+counts:
+  legal_transitions: 9
+  illegal_examples: 5
+  states: 5
+
+states:
+  - draft
+  - numbers-pending
+  - verification-ready
+  - verified
+  - sealed
+
+transitions:
+  - from: draft
+    to: numbers-pending
+    guard: any_claim_with_value
+    description: "出现至少 1 行有 value 的 claim"
+
+  - from: draft
+    to: verification-ready
+    guard: all_value_have_command
+    description: "一次性写齐 value+command"
+
+  - from: draft
+    to: verified
+    guard: no_claims_or_all_complete
+    description: "纯文字文档（无 claim）或一次性写齐"
+
+  - from: numbers-pending
+    to: verification-ready
+    guard: all_value_have_command
+    description: "补全所有 command"
+
+  - from: numbers-pending
+    to: draft
+    guard: no_claim_with_value
+    description: "回退：清空所有 value"
+
+  - from: verification-ready
+    to: verified
+    guard: all_complete_and_extensions_verified
+    description: "跑命令填 observed_result + extension verified/waived"
+
+  - from: verification-ready
+    to: numbers-pending
+    guard: any_value_without_command
+    description: "回退：删除 command"
+
+  - from: verified
+    to: sealed
+    guard: in_archive_path_and_complete
+    description: "用户唤起 /seal 且路径在 archive/legacy_results/"
+
+  - from: verified
+    to: numbers-pending
+    guard: any_value_without_observed_result
+    description: "回退：增加新 claim"
+
+terminal: [sealed]
+
+illegal_examples:
+  - from: draft
+    to: sealed
+    reason: "skip-states forbidden"
+  - from: sealed
+    to: draft
+    reason: "sealed terminal; use unseal_unsafe.py"
+  - from: sealed
+    to: verified
+    reason: "sealed terminal; use unseal_unsafe.py"
+  - from: numbers-pending
+    to: sealed
+    reason: "skip-states forbidden"
+  - from: verification-ready
+    to: sealed
+    reason: "skip-states forbidden"
+
+# 9 legal transitions + 5 illegal examples = §14.6 acceptance

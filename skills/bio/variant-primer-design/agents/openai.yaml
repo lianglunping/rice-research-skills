@@ -1,0 +1,7 @@
+interface:
+  display_name: "Variant Primer Design"
+  short_description: "Design SNP/InDel PCR primers with BLAST screening"
+  default_prompt: "Use $variant-primer-design to design SNP or InDel amplification primers, run BLAST specificity screening, and redesign failed loci."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bio Thesis Review Lanes"
+  short_description: "Review biology thesis text from external, advisor, or committee perspectives."
+  default_prompt: "Review the biology thesis artifact from the requested lane, prioritize substantive findings, and separate publication risk, advisor risk, and committee risk."

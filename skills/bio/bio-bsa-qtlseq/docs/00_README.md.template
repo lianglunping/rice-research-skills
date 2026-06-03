@@ -1,0 +1,151 @@
+# 葡萄 5h 失水率 BSA 分析交付包
+
+**版本**: v2.1 (审计后修复版)
+**交付日期**: 2026-04-17
+**项目编号**: 20260413_BSA
+**物种**: 葡萄 _Vitis vinifera_ (Genoscope.12X, Phytozome v13)
+
+---
+
+## ⚠️ 交付前必读
+
+> **本研究为候选区间筛选（candidate mapping），非精细定位（fine mapping）。**
+>
+> 1. **统计力限制**：本项目 bulkSize=20/池，低于 QTL-seq 方法学文献推荐的 ≥50（理想 ≥400; Takagi 2013; Mansfeld 2018）。识别到的区间为**候选信号**，需扩群或独立标记验证方可进入基因克隆。
+> 2. **阈值 fallback**：预设主阈值 Gprime q=0.01 与 QTLseq 99% CI 均**无显著区间**，交付的 20 个 Gprime q=0.05 区间与 6 个 QTLseq 95% CI 区间使用 FDR 5% 阈值，**预期假阳性约 1 个区间**。
+> 3. **候选基因**：本报告"候选基因"指区间内**全部注释基因**，**未经功能筛选**（如 GO/KEGG/差异表达）。见 `HOWTO_GO_KEGG.md`。
+> 4. 详细局限见 `02_LIMITATIONS.md`。
+
+---
+
+## 交付物清单
+
+```
+release/
+├── 00_README.md                      # 本文件（交付入口）
+├── 01_METHODS.md                     # 方法学 + 所有参数 + 流程图
+├── 02_LIMITATIONS.md                 # 6 大局限（⚠️必读）
+├── 03_COLUMN_DEFINITIONS.md          # 结果 TSV 列定义字典（新增）
+├── HOWTO_GO_KEGG.md                  # 下游 GO/KEGG 富集与抗旱基因 overlap 操作指南（新增）
+├── VERSION                           # 版本标识
+├── CHANGELOG.md                      # 版本修订记录
+├── Top_QTL_annotated.md              # 人工可读 Top QTL 表 + 下游建议
+├── MANIFEST.md5                      # 除 MANIFEST.md5 自身外所有文件的 MD5 校验
+├── results/
+│   ├── main/                          # 主分析 (window=1Mb, refAF=0.20)
+│   │   ├── Gprime_q005_regions.tsv               # 20 候选 QTL (FDR 5%)
+│   │   ├── Gprime_q005_regions_candidate_genes.tsv  # 5,710 区间内基因
+│   │   ├── QTLseq_ci95_regions.tsv               # 6 精细化 QTL (95% CI)
+│   │   ├── QTLseq_ci95_regions_candidate_genes.tsv  # 629 区间内基因 (unique=605)
+│   │   ├── Gprime_q001_regions.tsv               # q=0.01 阈值（空, 仅表头）
+│   │   ├── QTLseq_ci99_regions.tsv               # 99% CI（空, 仅表头）
+│   │   └── SUMMARY_v2.md                         # 完整 4×3 敏感性矩阵 + 结果摘要
+│   └── sensitivity/                   # 敏感性分析
+│       ├── window_500kb/              # window=500kb 降噪检查（含 README）
+│       └── refAF_035/                 # refAlleleFreq=0.35（含 README）
+├── figures/                           # 14 PDF + README.md 解读指南 (主 5 + w500k 5 + rf035 4)
+│   └── README.md                                 # 图表类型、解读流程、与 TSV 交叉引用
+├── scripts/                           # 复现脚本（参数化路径，审计后 v2.1）
+│   ├── parent_filter_and_pool_v2.py
+│   ├── qtlseqr_analysis_v2.R
+│   ├── orchestrator_v2.sh
+│   └── step7_annotate_v2.sh
+└── metadata/
+    ├── samples.tsv                               # 42 样本映射（含 phenotype_source）
+    ├── phenotype_source.meta.yaml                # 表型原始表元数据
+    ├── parameters.yaml                           # 所有参数
+    ├── software_versions.txt                     # 工具版本
+    └── environment.yml                           # conda 一键重建 env
+```
+
+---
+
+## 核心结果速览
+
+### 🌟 全基因组最强候选信号：chr5:23.2-25.0 Mb
+
+- **QTLseq 95% CI 精细化区间**：1.82 Mb（从 Gprime q=0.05 的 5.72 Mb 缩小 3.1 倍）
+- **peakΔSNP = +0.302** → HighBulk (抗旱池) 富集 Va-like 等位（方向与 Va 抗旱亲本的统计约定一致；未做生物学验证）
+- **maxGprime = 50.04**（全基因组最高）
+- 区间内 **176 个**注释基因，建议优先做 GO/KEGG 富集 + 已知抗旱基因 (VvDREB, VvMYB, VvNAC) 比对；详见 `HOWTO_GO_KEGG.md`
+
+### Top 6 精细化 QTL (QTLseq 95% CI)
+
+| QTL | 染色体 | 区间 (bp) | 长度 | peakΔSNP | 方向 | 候选基因数 |
+|-----|--------|-----------|------|----------|------|-----------|
+| ⭐ QTLseq_6 | chr5 | 23,199,401–25,021,533 | 1.82 Mb | **+0.302** | Va 富集 | **176** |
+| QTLseq_4 | chr14 | 23,172,819–24,651,223 | 1.48 Mb | +0.266 | Va 富集 | **110** |
+| QTLseq_5 | chr3 | 1,594,713–2,647,106 | 1.05 Mb | +0.262 | Va 富集 | **138** |
+| QTLseq_1 | chr12 | 1,407,321–3,408,933 | 2.00 Mb | −0.263 | Vv 富集 | **170** |
+| QTLseq_2 | chr12 | 3,644,509–3,709,142 | 64 kb | **−0.238** | Vv 富集 | **13** |
+| QTLseq_3 | chr13 | 5,219,608–5,498,302 | 279 kb | +0.246 | Va 富集 | **22** |
+
+**Top 6 合计 629 基因-区间命中**（见 `QTLseq_ci95_regions_candidate_genes.tsv`）。
+
+### Gprime q=0.05 候选区间：20 个，共 **5,710** 个候选基因
+
+详见 `results/main/Gprime_q005_regions.tsv` + `Gprime_q005_regions_candidate_genes.tsv`。
+
+### ⚠️ 建议剔除：chr11 qtl5 (11.16 Mb)
+
+在 QTLseq 95% CI 下**未检出独立峰**（11.16 Mb 宽度不符合精细化 QTL 的典型特征）。建议从优先候选列表剔除，**疑似**染色体级 stratification 或 LD 块。详见 `02_LIMITATIONS.md §4.2`。
+
+---
+
+## 立即可做（5 分钟上手）
+
+1. **看最强信号**: 打开 `figures/01_Gprime_manhattan.pdf`（主分析曼哈顿图）。chr5 右端那个最高的峰就是 qtl16/QTLseq_6。
+2. **查候选基因**:
+   ```bash
+   # chr5 qtl6 的 176 个候选基因（按基因 ID 去重）
+   awk '$4 ~ /^qtl6/' results/main/QTLseq_ci95_regions_candidate_genes.tsv | cut -f8 | sort -u
+   ```
+3. **列定义**: 看不懂 `peakDeltaSNP`/`AUCaT`/`meanQval` 列? 查 `03_COLUMN_DEFINITIONS.md`
+4. **下游富集**: 看 `HOWTO_GO_KEGG.md` 三种方案（Phytozome annotation_info.txt / gProfiler web / eggNOG-mapper）
+5. **复现分析**: 按 `01_METHODS.md §5` 的 conda env + 脚本重跑（约 20 min）
+
+---
+
+## 不在交付包中的文件（服务器按需获取）
+
+以下大文件体积较大，默认不在本 release 中。若需全 SNP 层级分析（如自定义 window 或窗口算法），联系分析方获取：
+
+- 全 SNP G' 结果 `Gprime_all_snps.tsv` (201 MB)
+- 全 SNP QTL-seq `QTLseq_all_snps.tsv` (164 MB)
+- R 对象 `*.rds`（总计 ~380 MB，可用 `readRDS()` 加载继续分析）
+- 服务器端可用 `bash scripts/orchestrator_v2.sh` 一键重跑。
+
+---
+
+## 完整性校验
+
+```bash
+md5sum grape_BSA_20260413_release_v2.1.tar.gz    # 对照 .md5 文件
+tar xzf grape_BSA_20260413_release_v2.1.tar.gz
+cd release
+md5sum -c MANIFEST.md5                            # 所有文件逐一校验
+```
+
+注: `MANIFEST.md5` 本身不在校验清单内（避免自引用）。
+
+---
+
+## 审计保证
+
+本交付包已通过**两轮多 Agent 审计**:
+
+- **第一轮 (2026-04-16)**: 项目整体审计（多 Agent + Codex, 28 项发现, 26 项修复 → v2_fixed）
+- **第二轮 (2026-04-17)**: 交付包独立审计（4 Agents, 22 项发现, 全部修复 → v2.1）
+
+完整审计轨迹内部留档（不随 release 分发）；如客户需要审计细节请联系分析方。
+
+---
+
+## 关键设计修正（v2.1 相对 v2.0 的差异）
+
+见 `CHANGELOG.md`。核心:
+- Tier A/B 重定义（按 meanQval 阈值）+ 实际基因数替换估计数
+- SUMMARY_v2.md 补全 4×3 敏感性矩阵
+- chr11 qtl5 的 w500kb 表述修正（仍显著但宽峰）
+- 脚本脱敏参数化 + 新增 environment.yml
+- 新增 03_COLUMN_DEFINITIONS.md / HOWTO_GO_KEGG.md / VERSION / CHANGELOG.md

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bio Original Paper Reading"
+  short_description: "Figure-driven original paper deep reading"
+  default_prompt: "Use $bio-original-paper-reading to deeply read an original biology paper with figure-by-figure evidence audit."

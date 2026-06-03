@@ -1,0 +1,76 @@
+# BSA Project Configuration Template
+# Usage: 填充下列字段后通过 /bsa-init --config bsa.yaml [--profile <species>] 启动
+
+project:
+  id: "{{ project_id }}"                     # 非空, [a-zA-Z][a-zA-Z0-9_-]*
+  description: "{{ description }}"
+  contact: "{{ contact_email }}"
+
+# species + reference 通常由 --profile 覆盖, 此处可覆写
+# species:
+#   name: Vitis vinifera
+#   common_name: grape
+#   ploidy: 2
+# reference:
+#   fa_path: ref/your_genome.fa
+#   gff3_path: ref/your_genome.gff3
+
+variant_source:
+  caller: DeepVariant                        # DeepVariant / GATK / bcftools / other
+  caller_model: WGS
+  cohort_vcf: vcf/cohort.vcf.gz
+  cohort_samples_total: 168                  # bcftools query -l | wc -l
+  genotype_mode: joint-call
+
+population:
+  type: F2                                   # F2 / BC1 / RIL / F3 等
+  parents:
+    high_source: Va                          # 高表型亲本样本名
+    low_source: Vv                           # 低表型亲本样本名
+  bulk_size: [20, 20]                        # [HighBulk, LowBulk] 个体数
+
+phenotype:
+  phenotype_file: phenotype.xlsx
+  phenotype_value_column: 5h                 # 或 phenotype_rank_column
+  phenotype_unit: "%"
+  phenotype_timepoint: 5h                    # 多时间点时必填
+  phenotype_batch: "2026_spring"             # 多批次时必填
+  bulk_selection_rule: "top-20 by value (ascending=HighBulk)"
+
+runtime:
+  conda_env: bsa                             # 默认 bsa, 可覆盖
+  cpu: 32
+  ram_gb: 64
+
+pipeline:
+  filterSNPs:
+    refAlleleFreq: 0.20                      # vignette 默认 0.35
+    minTotalDepth: 40
+    maxTotalDepth: 600
+    minSampleDepth: 15
+    minGQ: 0                                 # 池合并后 GQ=99 占位, minGQ=0 等于禁用
+    depthDifference: 100
+  Gprime:
+    windowSize: 1000000                       # 1 Mb
+    outlierFilter: deltaSNP
+    filterThreshold: 0.1
+  QTLseq:
+    replications: 10000
+    intervals: [95, 99]
+    seed: 42                                  # 强制可复现
+  sensitivity:
+    window_500kb: true
+    refAF_035: true
+  thresholds:
+    Gprime: [0.01, 0.05]                      # [preplanned, fallback]
+    QTLseq: [99, 95]
+  allow_fallback: true                        # 降档时强制生成 fallback_rationale.md
+
+output:
+  release_version: v2.1
+  formats: [pdf, png]
+  png_dpi: 600
+  pdf_font_embed: true
+  figure_pair_check: true
+  bundle: tar.gz
+  sign_with: [md5, sha256]

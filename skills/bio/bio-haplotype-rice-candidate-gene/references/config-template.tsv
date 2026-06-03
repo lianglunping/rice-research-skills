@@ -1,0 +1,24 @@
+field	value
+gene_id	REPLACE_GENE_ID
+gene_chr_gff	ChrNN
+gene_chr_vcf	NN
+gene_start	REPLACE_START
+gene_end	REPLACE_END
+gene_strand	+
+promoter_length	2000
+promoter_start	REPLACE_PROMOTER_START
+promoter_end	REPLACE_PROMOTER_END
+analysis_start	REPLACE_ANALYSIS_START
+analysis_end	REPLACE_ANALYSIS_END
+input_vcf	REPLACE_FULL_PATH/REPLACE_GENE_ID.vcf.gz
+input_gff	REPLACE_FULL_PATH/REPLACE_GENE_ID.gff3
+metadata_csv	/Volumes/Data/客户-生信/客户/辛威/LOC_Os11g16290/3K-info.csv
+sample_id_column	ID
+group_column	K5
+group_recode	Xian->XI;Geng->GJ
+exclude_rule	K5=na
+vcf_filter_missing	< 5%
+vcf_filter_maf	>= 0.05
+major_haplotype_threshold	n >= 30
+reference_assembly	MSU_osa1r7
+run_date	REPLACE_YYYYMMDD

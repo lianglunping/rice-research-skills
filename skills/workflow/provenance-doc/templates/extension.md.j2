@@ -1,0 +1,23 @@
+<!-- Extension slot: {{ id }} ({{ title }}) -->
+<!-- 由具体项目填充，绝不进入 core 模板 -->
+<!-- 此文件应放在 {extension_doc_dir}/_extensions/{{ id }}.md -->
+
+# {{ title }}
+
+> **业务统计扩展**：本节内容由具体项目提供，core 模板对内容无要求。
+>
+> 引用：在主 provenance.md 的 front-matter 中声明：
+> ```yaml
+> extension_sections:
+>   - id: {{ id }}
+>     title: "{{ title }}"
+>     source: _extensions/{{ id }}.md
+>     status: draft  # 完成后改为 verified；不可用时改为 waived 并填 waiver_reason
+> ```
+
+## TODO（由具体项目填写）
+
+- [ ] 描述本扩展统计的内容
+- [ ] 列出数据来源
+- [ ] 给出验证命令（可选，但推荐）
+- [ ] 写完后修改主文档 front-matter `status: verified`

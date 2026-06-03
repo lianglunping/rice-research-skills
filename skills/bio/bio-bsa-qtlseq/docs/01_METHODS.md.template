@@ -1,0 +1,143 @@
+# 分析方法与参数 (v2_fixed)
+
+## 1. 数据与样本
+
+### 1.1 输入数据
+- **参考基因组**: _Vitis vinifera_ `Vvinifera_457_Genoscope.12X.fa` (Phytozome v13)
+- **基因注释**: `Vvinifera_457_v2.1.gene.gff3` (31,845 基因)
+- **变异数据**: DeepVariant joint-called cohort VCF (168 样本, 17 GB)
+- **表型**: 5h 失水率（抗旱性指标），客户提供的抗旱 / 不抗极端样本列表（各 20 个体）
+
+### 1.2 样本-混池映射 (40 个体 + 2 亲本)
+
+参见 `metadata/samples.tsv`。
+
+- **HighBulk (抗旱池, n=20)**: 61, 123, 124, 87, 134, 23, 78, 139, 51, 133, 90, 128, 81, 66, 138, 101, 144, 125, 82, 153
+- **LowBulk (不抗池, n=20)**: 158, 99, 175, 110, 6, 96, 62, 162, 111, 165, 160, 52, 28, 32, 150, 188, 80, 11, 1, 113
+- **亲本**: Va (抗旱亲本) / Vv (不抗亲本)
+- 群体类型: F2
+
+---
+
+## 2. 分析流程（7 步）
+
+```
+cohort VCF (168 样本, 21.5M SNP+Indel)
+ │
+ │ Step 1  提取 42 样本 (20 High + 20 Low + Va + Vv)
+ │         bcftools view -S keep.list + 仅保留双等位 SNP
+ ▼
+ subset.snp.vcf.gz   (42 样本, 21,528,522 SNP, 4.2 GB)
+ │
+ │ Step 2-3  parent_filter_and_pool_v2.py（审计后 v2 版本）
+ │   - 过滤: Va/Vv 纯合且差异 + min-parent-dp=5 + 仅 chr1-19
+ │   - allele re-polarization: Va=0/0 位点交换 AD 让 SNPindex 恒等于 Va 频率
+ │   - 按池合并: HighBulk/LowBulk AD 加和, DP = AD_REF + AD_ALT
+ │   - half-call 容错 + 四路计数 (gt_missing / half_call / dp_low / not_homdiff)
+ ▼
+ pooled_v2.raw.vcf.gz   (2 样本合成 VCF, 3,653,444 位点)
+ │
+ │ Step 4  gatk VariantsToTable v4.6.2.0
+ │         -F CHROM -F POS -F REF -F ALT -F VA_HOM -F POLARIZED
+ │         -GF AD -GF DP -GF GQ
+ ▼
+ input_v2.table   (3,653,444 行)
+ │
+ │ Step 5  Rscript qtlseqr_analysis_v2.R (set.seed=42)
+ │   filterSNPs(refAF∈[0.2,0.8], DP∈[40,600], SampleDP≥15, depthDiff≤100)
+ │   runGprimeAnalysis(window=1e6, outlierFilter='deltaSNP', thr=0.1)
+ │   runQTLseqAnalysis(popStruc='F2', bulkSize=c(20,20), reps=10000, intervals=c(95,99))
+ │   getQTLTable(method='Gprime', alpha=0.01/0.05)
+ │   getQTLTable(method='QTLseq', interval=95/99)
+ ▼
+ Gprime_q005: 20 区间 / q001: 0 / ci99: 0 / ci95: 6
+ │
+ │ Step 6  bedtools intersect -a regions.bed -b genes.bed -wa -wb
+ ▼
+ *_candidate_genes.tsv
+```
+
+## 3. 关键参数
+
+### 3.1 亲本过滤 (`parent_filter_and_pool_v2.py`)
+
+```
+--chrom-regex '^chr[0-9]+$'   # 仅 chr1-chr19, 排除 *_random scaffold
+--min-parent-dp 5              # 亲本 DP 下限
+--va-sample Va                 # 抗旱亲本
+--vv-sample Vv                 # 不抗亲本
+```
+
+过滤条件: `Va=(0,0) and Vv=(1,1)` OR `Va=(1,1) and Vv=(0,0)`
+
+Re-polarization: 若 `Va=(0,0)` (参考等位是 Va)，交换 HighBulk/LowBulk 的 AD_REF/AD_ALT，使 QTLseqr 的 `SNPindex = AD_ALT/DP` 恒等于"池中 Va 等位频率"。
+
+### 3.2 QTLseqr 过滤 (`filterSNPs`)
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| `refAlleleFreq` | 0.20 | 保留 REF 频率 ∈ [0.20, 0.80] 的位点 (主) / 0.35 (敏感性) |
+| `minTotalDepth` | 40 | 两池合并总深下限 |
+| `maxTotalDepth` | 600 | 两池合并总深上限 |
+| `minSampleDepth` | 15 | 单池深度下限 |
+| `minGQ` | 0 | **GQ 过滤已禁用**（池合并后 GQ=99 为占位值） |
+| `depthDifference` | 100 | 两池 DP 差上限 |
+
+### 3.3 G' 分析 (`runGprimeAnalysis`)
+
+```
+windowSize       = 1e6 (主) / 5e5 (敏感性)
+outlierFilter    = 'deltaSNP'
+filterThreshold  = 0.1
+```
+
+### 3.4 QTL-seq 分析 (`runQTLseqAnalysis`)
+
+```
+popStruc     = 'F2'
+bulkSize     = c(20, 20)   # 高/低池个体数
+replications = 10000        # bootstrap 次数
+intervals    = c(95, 99)    # 95% 与 99% 置信区间
+set.seed(42)                # 可复现保证
+```
+
+### 3.5 QTL 报告阈值
+
+| 方法 | 阈值 | 结果 |
+|------|------|------|
+| Gprime | q < 0.01 | **0 区间** (未检出) |
+| Gprime | q < 0.05 ⭐ | **20 区间** (主交付, FDR 5%) |
+| QTLseq | 99% CI | **0 区间** (未检出) |
+| QTLseq | 95% CI ⭐ | **6 区间** (精细化, 比 Gprime 窄 3-20 倍) |
+
+## 4. 软件版本
+
+参见 `metadata/software_versions.txt`。
+
+- bcftools 1.6 + GATK 4.6.2.0 + QTLseqr 0.7.5.2 + R 4.5.1
+- pysam 0.23.3 + bedtools 2.30 + samtools 1.17
+
+## 5. 复现命令
+
+### 5.1 一键重跑（在配置好依赖的服务器上）
+
+```bash
+# 1) 创建 conda env (见 metadata/environment.yml)
+conda env create -f metadata/environment.yml
+conda activate bsa
+
+# 2) R 侧手动装 QTLseqr 0.7.5.2（见 environment.yml 注释）
+
+# 3) 准备项目目录（需将 cohort VCF, 参考基因组, 样本列表放在标准位置）
+export BSA_ROOT=/path/to/project
+export REF_FA=$BSA_ROOT/ref/Vvinifera_457_Genoscope.12X.fa
+export GFF=$BSA_ROOT/ref/Vvinifera_457_v2.1.gene.gff3
+
+# 4) 一键跑（主 + 2 敏感性, 约 20 min）
+bash scripts/orchestrator_v2.sh
+# 产物: $BSA_ROOT/analysis/results_v2/ + figures_v2/
+```
+
+### 5.2 服务器端大文件获取
+
+本 release 不含 `Gprime_all_snps.tsv` (201 MB)、`QTLseq_all_snps.tsv` (164 MB)、`.rds` (~380 MB) 等大文件。若客户需全 SNP 层级分析，请**联系分析方**获取，或按 5.1 自行重跑。

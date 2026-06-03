@@ -1,0 +1,236 @@
+---
+template: full
+status: {{ status | default('draft') }}
+version: {{ version }}
+created_at: {{ created_at }}
+sealed_at: {{ sealed_at | default('null') }}
+owner: {{ owner }}
+project: {{ project }}
+prior_version: {{ prior_version | default('null') }}
+delta_summary_path: {{ delta_summary_path | default('null') }}
+{% if extension_sections %}
+extension_sections:
+{% for ext in extension_sections %}
+  - id: {{ ext.id }}
+    title: "{{ ext.title }}"
+    source: {{ ext.source }}
+    status: {{ ext.status }}
+    waiver_reason: "{{ ext.waiver_reason | default('') }}"
+{% endfor %}
+{% else %}
+extension_sections: []
+{% endif %}
+verification:
+  remote_command_timeout_sec: {{ verification_timeout | default(300) }}
+  fail_closed_on_missing_meta: true
+  fail_closed_on_broken_yaml: true
+---
+
+# {{ title }}
+
+**版本**: {{ version }}
+**生成日期**: {{ created_at }}
+**所有者**: {{ owner }}
+**项目**: {{ project }}
+
+---
+
+## 0. 文档身份与范围
+
+### 0.1 分析目标
+{{ analysis_objective | default('TODO: 描述本次分析的核心目标') }}
+
+### 0.2 数据 cohort
+{{ cohort_description | default('TODO: 列出 cohort 范围、样本数、关键属性') }}
+
+### 0.3 纳入与排除标准
+{{ inclusion_exclusion | default('TODO: 列出纳入条件与排除规则') }}
+
+### 0.4 已知 caveats 与解读限制
+{{ caveats | default('TODO: 1-line 摘要 + 链接到 audit_*.md') }}
+
+---
+
+## 1. 工作流概述
+
+### 1.1 处理流程
+```
+{{ workflow_steps | default('TODO: 流程步骤图（mermaid 或 ASCII）') }}
+```
+
+### 1.2 输入登记
+| 数据类型 | 路径 | 用途 |
+|---------|-----|------|
+{% for inp in inputs | default([]) %}
+| {{ inp.kind }} | `{{ inp.path }}` | {{ inp.purpose }} |
+{% endfor %}
+
+### 1.3 输出登记（高层）
+详见 §4 产物登记表。
+
+---
+
+## 2. 代码、软件与版本登记
+
+### 2.1 代码 root
+| 项 | 值 |
+|----|----|
+| repo URL | {{ code_repo_url | default('TODO') }} |
+| commit SHA | {{ code_commit_sha | default('TODO') }} |
+| branch | {{ code_branch | default('TODO') }} |
+| 本地路径 | `{{ code_local_path | default('TODO') }}` |
+
+### 2.2 模块树（前 3 层目录）
+```
+{{ module_tree | default('TODO: tree -L 3') }}
+```
+
+### 2.3 入口脚本
+| 入口 | 路径 | 描述 |
+|-----|------|------|
+{% for ep in entrypoints | default([]) %}
+| {{ ep.name }} | `{{ ep.path }}` | {{ ep.desc }} |
+{% endfor %}
+
+### 2.4 依赖软件 + 版本号
+| 软件 | 版本 | 安装方式 |
+|-----|------|---------|
+{% for sw in software_versions | default([]) %}
+| {{ sw.name }} | `{{ sw.version }}` | {{ sw.install }} |
+{% endfor %}
+
+### 2.5 Config 文件链接
+{% for cfg in config_files | default([]) %}
+- `{{ cfg.path }}` — {{ cfg.desc }}
+{% endfor %}
+
+---
+
+## 3. 复现指南
+
+### 3.1 最小复现命令
+```bash
+{{ reproduce_command | default('# TODO: 一行可粘贴的 reproduce 命令') }}
+```
+
+### 3.2 关键参数
+| 参数 | 值 | 说明 |
+|-----|---|------|
+{% for p in reproduce_params | default([]) %}
+| `{{ p.name }}` | `{{ p.value }}` | {{ p.desc }} |
+{% endfor %}
+
+### 3.3 随机种子
+{{ random_seeds | default('seed = N/A') }}
+
+### 3.4 预期输出路径
+```
+{{ expected_outputs | default('TODO: list expected output paths') }}
+```
+
+### 3.5 运行环境提示
+{{ runtime_env_notes | default('TODO: GPU/内存/SSH 服务器名等') }}
+
+---
+
+## 4. 产物登记表
+
+> 本表由 `aggregate_meta.py` 从 sibling `*.meta.yaml` 或 `runs_manifest.yaml` 自动聚合。请勿手工修改 `checksum/size/record_count` 字段。
+
+| artifact_id | role | path | format | size | record_count | checksum | created_at | producer | meta_yaml |
+|-------------|------|------|--------|-----:|-------------:|----------|-----------:|----------|-----------|
+{% for a in artifacts | default([]) %}
+| {{ a.artifact_id }} | {{ a.role }} | `{{ a.path }}` | {{ a.format }} | {{ a.size }} | {{ a.record_count }} | `{{ a.checksum }}` | {{ a.created_at }} | {{ a.producer }} | `{{ a.meta_yaml }}` |
+{% endfor %}
+
+---
+
+## 5. 论断验证册
+
+> 每行一个 claim。`status` ∈ {verified, unverified, waived}。`waiver_reason` 在 status=waived 时必填且长度 ≥10。
+
+| claim_id | claim_text | value | source_artifact | command | observed_result | status | waiver_reason |
+|----------|-----------|-------|-----------------|---------|-----------------|--------|---------------|
+{% for c in claims | default([]) %}
+| {{ c.claim_id }} | {{ c.claim_text }} | `{{ c.value }}` | `{{ c.source_artifact }}` | `{{ c.command }}` | `{{ c.observed_result }}` | {{ c.status }} | {{ c.waiver_reason }} |
+{% endfor %}
+
+---
+
+## 6. 决策准则与参数
+
+### 6.1 参数来源文件
+{% for f in param_source_files | default([]) %}
+- `{{ f.path }}` — {{ f.desc }}
+{% endfor %}
+
+### 6.2 解读关键参数（≤30% 全字段）
+| 参数 | 值 | 影响 |
+|-----|---|------|
+{% for p in interpretation_critical | default([]) %}
+| `{{ p.name }}` | `{{ p.value }}` | {{ p.impact }} |
+{% endfor %}
+
+### 6.3 纳入排除规则
+{{ inclusion_rules | default('TODO') }}
+
+### 6.4 与上版参数差异
+{% for d in param_deltas | default([]) %}
+- `{{ d.name }}`: `{{ d.old }}` → `{{ d.new }}` ({{ d.reason }})
+{% endfor %}
+
+---
+
+## 7. 版本谱系
+
+### 7.1 时间线
+| 版本 | 日期 | 关键变更 |
+|-----|------|---------|
+{% for v in version_timeline | default([]) %}
+| {{ v.version }} | {{ v.date }} | {{ v.change }} |
+{% endfor %}
+
+### 7.2 与上一封版差异（摘要）
+{{ version_lineage_summary | default('TODO: ≤500 字封版差异；详细演化见 evolution.md') }}
+
+---
+
+## 8. 封版差异对比表
+
+| 指标 | 上版值 | 本版值 | 差值 | 变化原因 |
+|-----|-------|-------|------|---------|
+{% for d in version_deltas | default([]) %}
+| {{ d.metric }} | {{ d.old }} | {{ d.new }} | {{ d.delta }} | {{ d.reason }} |
+{% endfor %}
+
+---
+
+## 9. 路径可达性图
+
+### 9.1 本地路径
+{% for p in local_paths | default([]) %}
+- `{{ p.path }}` — {{ p.status }} ({{ p.note }})
+{% endfor %}
+
+### 9.2 服务器路径
+{% for p in remote_paths | default([]) %}
+- `{{ p.host }}:{{ p.path }}` — {{ p.status }} ({{ p.note }})
+{% endfor %}
+
+---
+
+{% if extension_sections %}
+## 业务统计扩展
+
+{% for ext in extension_sections %}
+### {{ ext.title }}
+
+> Source: `{{ ext.source }}` (status: {{ ext.status }})
+{% if ext.status == 'waived' %}
+> **WAIVED**: {{ ext.waiver_reason }}
+{% else %}
+{% include ext.source ignore missing %}
+{% endif %}
+
+{% endfor %}
+{% endif %}

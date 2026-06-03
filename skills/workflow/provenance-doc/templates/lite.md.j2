@@ -1,0 +1,159 @@
+---
+template: lite
+status: {{ status | default('draft') }}
+created_at: {{ created_at }}
+sealed_at: null
+owner: {{ owner }}
+project: {{ project }}
+{% if extension_sections %}
+extension_sections:
+{% for ext in extension_sections %}
+  - id: {{ ext.id }}
+    title: "{{ ext.title }}"
+    source: {{ ext.source }}
+    status: {{ ext.status }}
+{% endfor %}
+{% else %}
+extension_sections: []
+{% endif %}
+verification:
+  remote_command_timeout_sec: {{ verification_timeout | default(300) }}
+  fail_closed_on_missing_meta: {{ fail_closed_on_missing_meta | default(true) }}
+  fail_closed_on_broken_yaml: true
+---
+
+# {{ title }}
+
+**所有者**: {{ owner }} | **项目**: {{ project }} | **创建**: {{ created_at }}
+
+---
+
+## 0. 状态与范围
+
+- **当前状态**: `{{ status | default('draft') }}`
+- **任务目标**: {{ analysis_objective | default('TODO') }}
+- **目录**: `{{ analysis_dir | default('TODO') }}`
+- **负责人**: {{ owner }}
+- **适用边界**: {{ scope_boundary | default('TODO') }}
+
+---
+
+## 1. 输入与假设
+
+### 1.1 输入
+{% for inp in inputs | default([]) %}
+- `{{ inp.path }}` — {{ inp.purpose }}
+{% endfor %}
+
+### 1.2 关键假设
+{{ key_assumptions | default('TODO') }}
+
+### 1.3 已知缺口
+{{ known_gaps | default('TODO') }}
+
+---
+
+## 2. 代码路径、模块结构与运行环境
+
+### 2.1 代码 root
+- repo: {{ code_repo_url | default('TODO') }}
+- commit: `{{ code_commit_sha | default('TODO') }}`
+- 本地: `{{ code_local_path | default('TODO') }}`
+
+### 2.2 关键脚本/模块树
+```
+{{ module_tree | default('TODO: tree -L 2') }}
+```
+
+### 2.3 入口函数
+| 入口 | 路径 | 描述 |
+|-----|------|------|
+{% for ep in entrypoints | default([]) %}
+| {{ ep.name }} | `{{ ep.path }}` | {{ ep.desc }} |
+{% endfor %}
+
+### 2.4 软件版本（最关键 5–10 个）
+| 软件 | 版本 |
+|-----|------|
+{% for sw in software_versions | default([]) %}
+| {{ sw.name }} | `{{ sw.version }}` |
+{% endfor %}
+
+### 2.5 Config 链接
+{% for cfg in config_files | default([]) %}
+- `{{ cfg.path }}`
+{% endfor %}
+
+---
+
+## 3. 使用方法与复现步骤
+
+### 3.1 最小复现命令
+```bash
+{{ reproduce_command | default('# TODO') }}
+```
+
+### 3.2 参数
+{% for p in reproduce_params | default([]) %}
+- `{{ p.name }}` = `{{ p.value }}` ({{ p.desc }})
+{% endfor %}
+
+### 3.3 随机种子
+{{ random_seeds | default('seed = N/A') }}
+
+### 3.4 预期输出路径
+```
+{{ expected_outputs | default('TODO') }}
+```
+
+### 3.5 运行注意事项
+{{ runtime_notes | default('TODO') }}
+
+---
+
+## 4. 输出产物与已验证论断
+
+### 4.1 产物表
+| artifact_id | path | format | size | record_count | checksum |
+|-------------|------|--------|-----:|-------------:|----------|
+{% for a in artifacts | default([]) %}
+| {{ a.artifact_id }} | `{{ a.path }}` | {{ a.format }} | {{ a.size }} | {{ a.record_count }} | `{{ a.checksum }}` |
+{% endfor %}
+
+### 4.2 论断验证表（合并版）
+| claim_id | claim_text | value | command | observed_result | status |
+|----------|-----------|-------|---------|-----------------|--------|
+{% for c in claims | default([]) %}
+| {{ c.claim_id }} | {{ c.claim_text }} | `{{ c.value }}` | `{{ c.command }}` | `{{ c.observed_result }}` | {{ c.status }} |
+{% endfor %}
+
+---
+
+## 5. 关联、变更与限制
+
+### 5.1 关联文档
+{% for r in related_docs | default([]) %}
+- {{ r.kind }}: `{{ r.path }}`
+{% endfor %}
+
+### 5.2 变更摘要
+{{ change_summary | default('Initial creation') }}
+
+### 5.3 已知限制 / TODO
+{% for t in known_limits | default([]) %}
+- [ ] {{ t }}
+{% endfor %}
+
+---
+
+{% if extension_sections %}
+## 业务统计扩展
+
+{% for ext in extension_sections %}
+### {{ ext.title }}
+
+> Source: `{{ ext.source }}` (status: {{ ext.status }})
+{% include ext.source ignore missing %}
+
+{% endfor %}
+{% endif %}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Handover"
+  short_description: "Persist session state before clear"
+  default_prompt: "Use $handover to persist the current session state and update HANDOVER.md before clearing context or switching sessions."
+policy:
+  allow_implicit_invocation: true

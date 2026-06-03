@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bio Literature Synthesis Loop"
+  short_description: "Periodic synthesis of literature notes"
+  default_prompt: "Use $bio-literature-synthesis-loop to synthesize recent literature notes into periodic review, recall questions, and research seeds."

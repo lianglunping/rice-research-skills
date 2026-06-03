@@ -1,0 +1,98 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://lunping98.local/provenance-doc/frontmatter.schema.yaml"
+title: provenance.md front-matter schema
+type: object
+required: [template, status, created_at, sealed_at, owner, project]
+additionalProperties: false
+properties:
+  template:
+    type: string
+    enum: [full, lite]
+  status:
+    type: string
+    enum: [draft, numbers-pending, verification-ready, verified, sealed]
+  version:
+    type: [string, "null"]
+    pattern: "^v[0-9]{1,3}(\\.[0-9]{1,2}){0,2}$"
+  created_at:
+    type: string
+    format: date
+  sealed_at:
+    type: [string, "null"]
+    format: date
+  owner:
+    type: string
+    minLength: 1
+  project:
+    type: string
+    minLength: 1
+  prior_version:
+    type: [string, "null"]
+    pattern: "^v[0-9]{1,3}(\\.[0-9]{1,2}){0,2}$"
+  delta_summary_path:
+    type: [string, "null"]
+  extension_sections:
+    type: array
+    default: []
+    items:
+      type: object
+      required: [id, title, source, status]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          pattern: "^[a-z][a-z0-9_]{2,40}$"
+        title:
+          type: string
+          maxLength: 80
+        source:
+          type: string
+          # path safety enforced in code (no '..' / no abs path)
+        status:
+          type: string
+          enum: [draft, verified, waived]
+        waiver_reason:
+          type: string
+          minLength: 0
+      allOf:
+        - if:
+            properties: {status: {not: {const: waived}}}
+          then:
+            properties:
+              waiver_reason:
+                maxLength: 0
+        - if:
+            properties: {status: {const: waived}}
+          then:
+            properties:
+              waiver_reason:
+                type: string
+                minLength: 10
+  verification:
+    type: object
+    additionalProperties: false
+    properties:
+      remote_command_timeout_sec:
+        type: integer
+        minimum: 1
+        maximum: 1800
+        default: 300
+      fail_closed_on_missing_meta:
+        type: boolean
+        default: true
+      fail_closed_on_broken_yaml:
+        type: boolean
+        const: true   # cannot be overridden
+allOf:
+  - if:
+      properties: {template: {const: full}}
+    then:
+      required: [version, prior_version]
+  - if:
+      properties: {status: {const: sealed}}
+    then:
+      required: [sealed_at]
+      properties:
+        sealed_at:
+          type: string
+          format: date

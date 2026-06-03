@@ -1,0 +1,13 @@
+sample_id	bulk	role	phenotype_value	phenotype_rank	phenotype_source	vcf_match	note
+# 模板说明:
+#   bulk: HighBulk / LowBulk / parent / exclude
+#   role: 业务语义角色（如 抗旱亲本 / 高表型个体）
+#   phenotype_value: 连续数值; 无则填 NA
+#   phenotype_rank: 等级; 与 phenotype_value 至少一列有值
+#   phenotype_source: 客户提供文件名 + 行号引用
+#   vcf_match: bcftools query -l 核对结果 yes/no
+# 示例（grape 5h）:
+# Va	parent	抗旱亲本	NA	NA	client_confirmed_2026-04-16	yes	客户确认抗旱亲本
+# Vv	parent	不抗亲本	NA	NA	client_confirmed_2026-04-16	yes	客户确认不抗亲本
+# 61	HighBulk	抗旱个体	3.2	1	5h失水率.xlsx:row5	yes	20 高表型极端个体之一
+# 158	LowBulk	不抗个体	12.4	40	5h失水率.xlsx:row25	yes	20 低表型极端个体之一

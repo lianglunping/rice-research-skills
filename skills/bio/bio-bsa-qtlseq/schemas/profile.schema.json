@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bsa-qtlseq/schemas/profile.schema.json",
+  "title": "Species Profile Schema",
+  "description": "profile.yaml 只含 species/reference 默认值, 与 project.yaml deep-merge",
+  "type": "object",
+  "required": ["species", "reference"],
+  "additionalProperties": false,
+  "properties": {
+    "species": {
+      "type": "object",
+      "required": ["name", "ploidy"],
+      "properties": {
+        "name": { "type": "string" },
+        "common_name": { "type": "string" },
+        "ploidy": { "type": "integer", "minimum": 1, "maximum": 8 }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "required": ["assembly_id", "chrom_list"],
+      "properties": {
+        "assembly_id": { "type": "string" },
+        "annotation_source": { "type": "string" },
+        "chrom_regex": { "type": "string" },
+        "chrom_list": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "gene_feature_type": { "type": "string", "default": "gene" },
+        "gene_id_regex": { "type": "string", "default": "ID=([^;]+)" },
+        "gene_id_prefix": {
+          "type": "string",
+          "x-doc-only": true,
+          "description": "仅文档示例"
+        }
+      }
+    }
+  }
+}

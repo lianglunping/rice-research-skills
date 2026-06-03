@@ -1,0 +1,3 @@
+name	CHROM	POS	REF	ALT
+demo_indel	chrSynthetic	181	CAG	C
+demo_snp	chrSynthetic	221	A	G

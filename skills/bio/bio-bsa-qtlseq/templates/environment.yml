@@ -1,0 +1,25 @@
+name: bsa
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - r-base=4.5
+  - bcftools=1.6           # 保留 1.6 以匹配本项目实际运行版本; 新环境可升 1.17+
+  - vcftools=0.1.17
+  - gatk4=4.6.2.0
+  - samtools=1.23
+  - bedtools=2.31
+  - pysam=0.23.3
+  - r-optparse              # Round 2 自评补: plot_joint_manhattan.R 依赖
+  - r-ggplot2
+  - r-dplyr
+  - jq                      # Codex R2-C2
+  - pip
+  - pip:
+    - pysam>=0.23,<0.24
+# R 侧包（conda 不装, 需手动）:
+#   install.packages(c("devtools", "ggplot2", "dplyr", "Rcpp", "locfit", "modeest"))
+#   R CMD INSTALL <(curl -L https://gh-proxy.com/https://github.com/bmansfeld/QTLseqr/archive/refs/tags/v0.7.5.2.tar.gz)
+#   (若 v0.7.5.2 tag 不存在, 退化到 master 可能随时漂移, 请以当前 commit hash 锁定)

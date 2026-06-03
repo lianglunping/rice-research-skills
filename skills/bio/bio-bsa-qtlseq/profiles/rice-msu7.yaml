@@ -1,0 +1,14 @@
+# Species Profile: 水稻 (Oryza sativa) + MSU7
+species:
+  name: Oryza sativa
+  common_name: rice
+  ploidy: 2
+
+reference:
+  assembly_id: IRGSP-1.0
+  annotation_source: MSU7
+  chrom_regex: '^Chr[0-9]+$'
+  chrom_list: [Chr1, Chr2, Chr3, Chr4, Chr5, Chr6, Chr7, Chr8, Chr9, Chr10, Chr11, Chr12]
+  gene_feature_type: gene
+  gene_id_regex: 'ID=([^;]+)'
+  gene_id_prefix: "LOC_Os"

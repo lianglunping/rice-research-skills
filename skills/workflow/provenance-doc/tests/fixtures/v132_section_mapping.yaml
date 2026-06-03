@@ -1,0 +1,109 @@
+# ============================================================
+# `target` syntax grammar (consumed by tests/check_v132_mapping.py):
+#
+#   target := "full §<digit>" ("+" tail)*
+#         |  "extension <ext_id>"
+#         |  "omit"
+#   tail   := "§<digit>"
+#         |  "extension <ext_id>"
+#
+# Examples:
+#   "full §0"
+#   "full §0 + extension domain_cohort"
+#   "full §1 + §2"
+#   "extension domain_stat_a"
+# ============================================================
+
+# Gold-standard mapping: v1.3.2 539 lines -> core sections + extensions + omit
+# Pass condition (§14.1): mapped lines >= 485 (>= 90% of 539)
+# check_v132_mapping.py validates this fixture against the actual file.
+
+source_file: "/path/to/project/archive/legacy_results/v1.3.2/provenance.md"
+total_lines: 539
+
+mapping:
+  - source_lines: "1-7"        # 元信息
+    target: "full §0"
+    description: "title, version, generation date, verification declaration"
+
+  - source_lines: "9-67"       # 研究背景与样本构成
+    target: "full §0 + extension domain_cohort"
+    description: "samples, mutagenesis condition, exclusions, anomaly samples"
+
+  - source_lines: "69-150"     # Pipeline 概述
+    target: "full §1 + §2"
+    description: "input registry, processing flow, version definition, code locations"
+
+  - source_lines: "153-223"    # 核心结果文件清单
+    target: "full §4"
+    description: "per-file path/size/MD5/rows/cols"
+
+  - source_lines: "226-316"    # 核心数字验证表
+    target: "full §5"
+    description: "claim verification with run-able commands"
+
+  - source_lines: "319-353"    # Variant_Location 分布
+    target: "extension domain_stat_a"
+    description: "domain-specific position-class stats"
+
+  - source_lines: "355-382"    # M2 家系分布
+    target: "extension domain_stat_b"
+    description: "domain-specific family stats"
+
+  - source_lines: "385-444"    # 关键参数
+    target: "full §6"
+    description: "filter parameter table"
+
+  - source_lines: "447-498"    # 版本演化
+    target: "full §7 + §8"
+    description: "version timeline + delta vs prior version"
+
+  - source_lines: "501-530"    # 文件路径索引
+    target: "full §9"
+    description: "local + remote path index"
+
+  - source_lines: "532-539"    # 基因统计
+    target: "extension domain_stat_c"
+    description: "domain-specific gene-hit stats"
+
+  - source_lines: "8"          # blank line between header and §0
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "68"         # blank between §0 and §1
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "151-152"    # blank between §1 and §2 file-list
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "224-225"    # blank between §2 and §3
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "317-318"    # blank between §3 and §4
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "354"        # blank
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "383-384"    # blank between §5 and §6
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "445-446"    # blank between §6 and §7
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "499-500"    # blank between §7 and §8
+    target: "omit"
+    description: "blank separator"
+
+  - source_lines: "531"        # blank between §9 and §10
+    target: "omit"
+    description: "blank separator"
+
+# Coverage check: sum of (b-a+1) over all source_lines should be >= 485

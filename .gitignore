@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.tmp
+temp_tests/
+scratch/
+.venv/
+.env
+.env.*
+node_modules/

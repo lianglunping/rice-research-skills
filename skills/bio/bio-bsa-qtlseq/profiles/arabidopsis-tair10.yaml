@@ -1,0 +1,14 @@
+# Species Profile: 拟南芥 (Arabidopsis thaliana) + TAIR10
+species:
+  name: Arabidopsis thaliana
+  common_name: arabidopsis
+  ploidy: 2
+
+reference:
+  assembly_id: TAIR10
+  annotation_source: TAIR10
+  chrom_regex: '^[0-9]+$'   # TAIR10 用纯数字染色体名
+  chrom_list: ['1', '2', '3', '4', '5']
+  gene_feature_type: gene
+  gene_id_regex: 'ID=([^;]+)'
+  gene_id_prefix: "AT"

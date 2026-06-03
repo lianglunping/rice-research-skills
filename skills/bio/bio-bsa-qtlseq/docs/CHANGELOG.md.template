@@ -1,0 +1,69 @@
+# CHANGELOG — 葡萄 5h 失水率 BSA Release
+
+## [v2.1] - 2026-04-17 (第二轮审计后修复版)
+
+基于第二轮多 Agent 审计（4 Agents, 22 项发现）全部修复。
+
+### Fixed (Critical, P0)
+
+- **Tier A/B 分级**: 从 "A (q<0.02)=16 个" 修正为 "A (meanQval<0.025)=6 个 / B (0.025-0.035)=12 个 / C (0.035-0.05)=2 个" (审计 C1)
+- **Top 6 候选基因数**: 从估计值 (~5/~85/~140) 换成 bedtools 实测值 (13/138/176)，合计 ~535 → 629 (审计 C2)
+- **SUMMARY_v2.md**: 补全 4×3 完整敏感性矩阵（含 w500k q001=23, w500k ci95=18, rf035 ci95=7 等未报数字）(审计 C3)
+
+### Fixed (Major, P1)
+
+- chr11 qtl5 "w500kb 下也无一致信号" 表述修正（w500kb 下仍显著但未收缩为 <1 Mb 细窗）(审计 M1)
+- 00_README "方向与 Va 一致 ✅" 去除 emoji 暗示（仅为统计约定）(审计 M2)
+- Top_QTL chr12 qtl2 "可直接候选基因克隆" → "适合优先做标记验证与候选基因功能筛选" (审计 M3)
+- 00_README "5,757 基因" → "5,710 基因"（实测 `wc -l`）(审计 M4)
+- 服务器路径脱敏: scripts/ 参数化 `${BSA_ROOT}` `${GFF}` `${CONDA_ENV}`；README/METHODS 去除 ssh 原样命令 (审计 M5)
+- 外部链接声明: 所有指向项目根的引用明确标注"不在 release 内" (审计 M6)
+
+### Added (Major, P1)
+
+- **`03_COLUMN_DEFINITIONS.md`**: 所有 TSV 列字典（peakDeltaSNP / AUCaT / meanQval / posMaxGprime 等）(审计 M7)
+- **`HOWTO_GO_KEGG.md`**: 下游富集三方案（Phytozome annotation_info / gProfiler / eggNOG-mapper）+ 葡萄已知抗旱基因 overlap 操作指南 (审计 M9)
+- **`metadata/environment.yml`**: conda 一键重建 env (审计 M8)
+- **`metadata/phenotype_source.meta.yaml`**: 表型原始表元数据（从项目根复制）
+- **`VERSION`** + **`CHANGELOG.md`**（本文件）(审计 m5)
+- **`results/sensitivity/*/README.md`**: 每个敏感性目录加 mini-README (审计 m1)
+- **`figures/README.md`**: 14 张 PDF 的图表解读指南（5 类图 × 3 参数组合 + 典型客户解读流程 + 与 TSV 交叉引用）
+- **00_README 新增"立即可做"小节**: 5 步上手指南 (审计 S1)
+
+### Changed (Minor, P2)
+
+- `samples.tsv` 加 `phenotype_source` + `vcf_match` 列 (审计 M10)
+- Top 10 表交换 qtl7/qtl9 顺序（按 maxGprime 正确排序）(审计 m3)
+- 删除冗余 `figures/00_diagnostic_rf035.pdf` (与 00_diagnostic.pdf md5 相同) (审计 m2)
+- `qtl` 编号跳跃说明加入 `03_COLUMN_DEFINITIONS.md` (审计 m4)
+- R 脚本 `set.seed(42)` 移到每个 run 函数调用前，保证并行 job 间一致性 (审计 m6)
+- R 脚本加 usage 注释 (审计 m7)
+- chr11 qtl5 "不是真 QTL" → "缺乏 QTLseq CI 与 w500kb 支持, 建议剔除, 疑似 stratification/LD" (审计 m8)
+- MANIFEST.md5 加头注释"excludes MANIFEST.md5 itself" (审计 m9)
+
+### Tarball
+- 文件: `grape_BSA_20260413_release_v2.1.tar.gz`
+- Md5: 见 `grape_BSA_20260413_release_v2.1.tar.gz.md5`
+
+---
+
+## [v2.0 / v2_fixed] - 2026-04-16 (首版交付)
+
+基于第一轮审计（28 项发现, 26 项修复）全部修复后发布。
+
+### Added
+- v2 流水线: allele re-polarization / set.seed(42) / pool DP=sum(AD) / parent_skip 四分类计数
+- 敏感性分析: window=500kb + refAlleleFreq=0.35
+- 15 张曼哈顿图 PDF
+- 4 脚本 scripts/*_v2.*
+
+### Core Results
+- Gprime q=0.05: 20 候选 QTL
+- QTLseq 95% CI: 6 精细化 QTL
+- chr5:23.2-25.0 Mb 为最强候选 (maxGprime=50.04, peakΔSNP=+0.302)
+
+### Known Issues (在 v2.1 修复)
+- Tier A/B 分级错 (C1)
+- Top 6 基因数估计值偏差 (C2)
+- SUMMARY 选择性汇报 (C3)
+- 及其他 P1-P2 共 19 项

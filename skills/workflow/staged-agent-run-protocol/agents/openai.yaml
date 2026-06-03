@@ -1,0 +1,18 @@
+interface:
+  display_name: "Staged Agent Run Protocol"
+  short_description: "Run complex research tasks as auditable staged workflows."
+  default_prompt: "Use $staged-agent-run-protocol to initialize or continue this task as a staged, reproducible research run with phase boundaries, TODO, QC gates, provenance, monitoring, and rendered HTML navigation."
+version: "0.2.1-rc"
+keywords:
+  - "staged run"
+  - "bioinformatics"
+  - "provenance"
+  - "QC gate"
+  - "TODO"
+  - "monitoring"
+  - "reproducible"
+  - "HTML"
+tags:
+  - "Research"
+  - "Bioinformatics"
+  - "Reproducibility"
