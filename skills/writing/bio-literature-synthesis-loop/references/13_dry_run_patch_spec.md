@@ -39,3 +39,4 @@ TABLE ...
 - Keep synthesis note patches separate from dashboard query patches.
 - When note metadata are incomplete, prefer a repair queue preview over a normal summary patch.
 - If the corpus is `micro_corpus`, state that the patch is provisional and should not be treated as a mature literature dashboard.
+

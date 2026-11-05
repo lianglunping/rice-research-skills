@@ -33,3 +33,4 @@ ranking_rationale:
 - `Reject`: weak evidence, not feasible, or not aligned.
 
 Always state the failure mode.
+

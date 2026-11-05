@@ -27,3 +27,4 @@ Periodic synthesis should help retention and research planning, not just list pa
 10. Next-cycle reading plan.
 
 Avoid mechanical summaries. Prioritize changes in understanding.
+

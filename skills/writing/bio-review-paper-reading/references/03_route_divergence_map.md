@@ -40,3 +40,4 @@ failure_modes:
 - `competitive`: routes propose alternative explanations or methods.
 - `dependency`: one route requires resources from another.
 - `translation_chain`: discovery route feeds validation and breeding route.
+

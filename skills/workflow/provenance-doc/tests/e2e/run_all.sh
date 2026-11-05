@@ -6,7 +6,7 @@
 # Final stat line: PASS: N  FAIL: M
 set -euo pipefail
 
-SKILL="$HOME/.codex/skills/provenance-doc"
+SKILL="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PASS=0
 FAIL=0
 
@@ -29,7 +29,7 @@ run_case() {
 # -----------------------------------------------------------------------
 run_case "E2E-1 v132-mapping" '
     set -euo pipefail
-    uv run --with pyyaml python3 "$HOME/.codex/skills/provenance-doc"/tests/check_v132_mapping.py
+    uv run --with pyyaml python3 "${SKILL}"/tests/check_v132_mapping.py
 '
 
 # -----------------------------------------------------------------------
@@ -38,10 +38,10 @@ run_case "E2E-1 v132-mapping" '
 run_case "E2E-2 lite-loop" '
     set -euo pipefail
     rm -f /tmp/e2e2_prov.md
-    uv run "$HOME/.codex/skills/provenance-doc"/scripts/new_provenance.py \
+    uv run "${SKILL}"/scripts/new_provenance.py \
         --template lite --out /tmp/e2e2_prov.md --owner u --project p
     uv run --with pyyaml --with jsonschema python3 \
-        "$HOME/.codex/skills/provenance-doc"/scripts/status_check.py /tmp/e2e2_prov.md
+        "${SKILL}"/scripts/status_check.py /tmp/e2e2_prov.md
     rm -f /tmp/e2e2_prov.md
 '
 
@@ -74,7 +74,7 @@ extension_sections:
 # body
 EOF
     uv run --with pyyaml \
-        "$HOME/.codex/skills/provenance-doc"/scripts/render_doc.py \
+        "${SKILL}"/scripts/render_doc.py \
         --doc /tmp/e2e3_dir/prov.md --fail-on-missing-extension
     grep -q "42" /tmp/e2e3_dir/prov.md
     rm -rf /tmp/e2e3_dir
@@ -103,7 +103,7 @@ extension_sections:
 ---
 EOF
     if uv run --with pyyaml \
-           "$HOME/.codex/skills/provenance-doc"/scripts/render_doc.py \
+           "${SKILL}"/scripts/render_doc.py \
            --doc /tmp/e2e4_dir/prov.md --fail-on-missing-extension; then
         rm -rf /tmp/e2e4_dir
         exit 1
@@ -137,7 +137,7 @@ extension_sections:
 ---
 EOF
     if uv run --with pyyaml --with jsonschema python3 \
-           "$HOME/.codex/skills/provenance-doc"/scripts/status_check.py \
+           "${SKILL}"/scripts/status_check.py \
            /tmp/e2e5_dir/archive/legacy_results/v1.0/provenance.md; then
         rm -rf /tmp/e2e5_dir
         exit 1
@@ -168,11 +168,11 @@ extension_sections: []
 EOF
     chmod 444 /tmp/e2e6_dir/archive/legacy_results/v1.0/provenance.md
     uv run --with pyyaml --with jsonschema python3 \
-        "$HOME/.codex/skills/provenance-doc"/scripts/status_check.py \
+        "${SKILL}"/scripts/status_check.py \
         /tmp/e2e6_dir/archive/legacy_results/v1.0/provenance.md --enforce-sealed
     chmod 644 /tmp/e2e6_dir/archive/legacy_results/v1.0/provenance.md
     if uv run --with pyyaml --with jsonschema python3 \
-           "$HOME/.codex/skills/provenance-doc"/scripts/status_check.py \
+           "${SKILL}"/scripts/status_check.py \
            /tmp/e2e6_dir/archive/legacy_results/v1.0/provenance.md --enforce-sealed; then
         rm -rf /tmp/e2e6_dir
         exit 1
@@ -202,7 +202,7 @@ project: p
 | c1 | remote ls | 1 | x | ssh remotehost ls | | unverified |  |
 EOF
     combined=$(uv run --with pyyaml \
-        "$HOME/.codex/skills/provenance-doc"/scripts/verify_claims.py \
+        "${SKILL}"/scripts/verify_claims.py \
         --doc /tmp/e2e7_prov.md < /dev/null 2>&1 || true)
     echo "$combined" | grep -qE "DENIED|SKIP"
     rm -f /tmp/e2e7_prov.md
@@ -236,7 +236,7 @@ field_y: b
 field_z: c
 EOF
     if uv run --with pyyaml \
-           "$HOME/.codex/skills/provenance-doc"/scripts/lint_no_duplication.py \
+           "${SKILL}"/scripts/lint_no_duplication.py \
            /tmp/e2e8_dir/prov.md /tmp/e2e8_dir/run.yaml; then
         rm -rf /tmp/e2e8_dir
         exit 1
@@ -254,13 +254,13 @@ run_case "Perf-baseline <=120s" '
     printf "| metric | val |\n|--------|-----|\n| n | 1 |\n" \
         > /tmp/perf_demo_dir/_extensions/stat_a.md
     start=$(date +%s)
-    uv run "$HOME/.codex/skills/provenance-doc"/scripts/new_provenance.py \
+    uv run "${SKILL}"/scripts/new_provenance.py \
         --template lite --out /tmp/perf_demo_dir/prov.md --owner u --project p
     uv run --with pyyaml --with jsonschema python3 \
-        "$HOME/.codex/skills/provenance-doc"/scripts/status_check.py \
+        "${SKILL}"/scripts/status_check.py \
         /tmp/perf_demo_dir/prov.md
     uv run --with pyyaml \
-        "$HOME/.codex/skills/provenance-doc"/scripts/render_doc.py \
+        "${SKILL}"/scripts/render_doc.py \
         --doc /tmp/perf_demo_dir/prov.md
     end=$(date +%s)
     elapsed=$((end - start))

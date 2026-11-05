@@ -3,10 +3,10 @@
 - Overall verdict:
 
 ## Strengths
--
+- 
 
 ## Required changes
--
+- 
 
 ## Suggestions
--
+- 

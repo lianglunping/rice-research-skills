@@ -1,8 +1,9 @@
 ---
 name: bio-gatk-variant-calling
-description: Variant calling with GATK HaplotypeCaller following best practices. Covers germline SNP/indel calling, GVCF workflow for cohorts, joint genotyping, and variant quality score recalibration (VQSR). Use when calling variants with GATK HaplotypeCaller.
-tool_type: cli
-primary_tool: gatk
+description: "Gatk variant calling: Variant calling with GATK HaplotypeCaller following best practices."
+metadata:
+  tool_type: cli
+  primary_tool: gatk
 ---
 
 ## Version Compatibility
@@ -420,3 +421,12 @@ gatk VariantFiltration -R $REF -V ${SAMPLE}.vcf.gz \
 - filtering-best-practices - Post-calling filtering
 - variant-normalization - Normalize before annotation
 - vep-snpeff-annotation - Annotate final calls
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

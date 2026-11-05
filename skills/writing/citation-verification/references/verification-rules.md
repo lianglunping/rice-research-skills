@@ -397,3 +397,4 @@ VERIFICATION_THRESHOLDS = {
 - title_similarity: 0.80
 - author_similarity: 0.60
 - high_confidence: 0.85
+

@@ -17,3 +17,4 @@ Use these as compact style anchors, not fixed templates.
 ## Critical Lesson
 
 When a paper uses a clean final model figure but candidate filtering steps are not fully shown, record the missing decision trail. For our own work, preserve candidate exclusion tables, filtering thresholds, and negative validations so the final story remains auditable.
+

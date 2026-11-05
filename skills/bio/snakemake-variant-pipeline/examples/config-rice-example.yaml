@@ -1,11 +1,11 @@
-# Example: Rice 131-sample resequencing project (802 reference)
+# Example configuration for a caller-supplied rice resequencing project
 # Default policy: GATK workflow with mapping-QC marking enabled.
 # The same project can stop at QC-only or BAM-only by changing main.smk includes.
 
-ref: /path/to/remote-home/data/work/131/ref/802.genome.fa
-fq_dir: /path/to/remote-home/data/work/131/input/cleandata
-bam_dir: /path/to/remote-home/data/work/131/output/01.BWA/bam
-base_dir: /path/to/remote-home/data/work/131/output
+ref: /path/to/project/ref/reference.fa
+fq_dir: /path/to/project/input/cleandata
+bam_dir: /path/to/project/output/01.BWA/bam
+base_dir: /path/to/project/output
 samples: samples.tsv
 
 # FASTQ naming: {sample}_1.clean.fq.gz / {sample}_2.clean.fq.gz
@@ -23,7 +23,7 @@ conda:
   sv_merge: sv_consensus
   bcftools: ngs
 
-conda_init: "source /path/to/remote-home/miniconda3/etc/profile.d/conda.sh"
+conda_init: "source /path/to/conda/etc/profile.d/conda.sh"
 
 resources:
   qc:

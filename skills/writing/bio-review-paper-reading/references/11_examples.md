@@ -24,3 +24,4 @@ minimum_analysis: screen existing mutant resequencing data for candidate SVs nea
 minimum_validation_experiment: PCR breakpoint validation plus qRT-PCR under drought treatment
 main_risk: phenotype may be background- or environment-specific
 ```
+

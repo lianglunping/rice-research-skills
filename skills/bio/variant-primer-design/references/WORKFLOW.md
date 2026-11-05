@@ -16,7 +16,7 @@ report a `preference_conflict` instead of silently using the baseline short-ampl
 ## First-Use Setup
 
 ```bash
-cd /path/to/codex/skills/variant-primer-design
+cd "${CODEX_HOME:?Set CODEX_HOME to the Codex configuration root}/skills/variant-primer-design"
 bash scripts/bootstrap_env.sh
 ```
 

@@ -1,7 +1,5 @@
-# Staged Agent Run Protocol v0.1
+# Staged Agent Run Protocol v0.1 (Legacy Schema Reference)
 
-作者：梁博 / GPT-5.5 Pro 修改稿
-日期：2026-05-12
 协议名：`staged_agent_run_protocol`
 版本：`0.1.0`
 默认 profile：`standard`

@@ -1,81 +1,95 @@
-# 方法描述模板 — 水稻候选基因单倍型与群体遗传分析
+# 水稻候选基因单倍型分析文稿模板（模式感知）
 
-> 将 `{GENE_ID}`、`{CHR_NUM}`、`{GENE_START}`、`{GENE_END}`、`{GENE_STRAND}`、`{PROMOTER_START}`、`{PROMOTER_END}`、`{ANALYSIS_START}`、`{ANALYSIS_END}`、`{TOTAL_LEN_KB}`、`{PRE_QC_VARIANTS}`、`{POST_QC_VARIANTS}`、`{HAP_RETAINED_N}`、`{TOTAL_SAMPLE_N}`、`{HAP_COUNT}`、`{MAJOR_HAP_COUNT}`、`{MAJOR_HAP_SAMPLE_N}` 替换为实际值。
+本模板用于生成客户 `manuscript/` 中的中文材料与方法、结果与分析、逐 panel 图注和参考文献。文稿必须由冻结配置、结果 TSV/XLSX、软件版本记录和 QA 证据动态生成；不得从旧基因复制数字、坐标、软件或结论。
 
----
+## 1. 先冻结分析模式
 
-## 1. 数据来源
+写作前读取项目 `formal_mode`，不得跨模式套用阈值、群体、树 tip 单位、VCF 角色或图形变换。
 
-本研究基于 3,000 水稻基因组计划（3,000 Rice Genomes Project，3K RGP）的全基因组测序数据。3K RGP 收录了来自亚洲 89 个国家和地区的 3,000 份栽培稻材料，代表了籼稻（Xian/Indica）、粳稻（Geng/Japonica）、混合群（Admixture）、Aus 和 Basmati 五大亚群（K5 分组）的主要遗传多样性。基因组变异以 VCF 格式提供，参考基因组版本为水稻 MSU Release 7（MSU_osa1r7）。目标基因 {GENE_ID} 的基因结构注释来源于 MSU_osa1r7 GFF3 文件。
+| formal_mode | 数据与写作入口 |
+|---|---|
+| 3K 正式模式 | 使用 3K RGP VCF、K5 分组和项目配置的 missing/MAF/site bad-rate 规则 |
+| superrice_reference_compatible_v2 | 使用万份水稻变异图数据库、详细 XI/GJ/Or/Undefined 分组和 reference-compatible 合同 |
+| superrice_publication_compact_v3 | 使用 accession carrier 阈值与 XI/GJ 推断单位合同 |
+| superrice_reference_two_mainfig_v4 | 使用 phased chromosome-copy `n >= 30` major set、全 retained-accession 样本树和两张主图合同 |
 
-## 2. 样本筛选
+必须从项目 sensitivity audit 读取万份水稻 site bad-rate 阈值；不得把 3%、10% 或任一旧项目阈值写成通用规则。Pi 使用交付数据的原始量纲；除非配置和 Source Data 明确规定，否则不得默认写成 -log10(Pi)。
 
-以 K5 亚群分类信息为依据，排除 K5 缺失或未被分类（K5 = na）的样本，保留可分类样本 **{TOTAL_SAMPLE_N}** 份。
+## 2. 冻结字段
 
-## 3. 目标区间定义
+至少从配置和结果表读取以下字段，并在写作前核对分母和单位：
 
-目标基因 {GENE_ID} 位于第 {CHR_NUM} 号染色体（Chr{CHR_NUM}），基因体坐标为 {GENE_START}–{GENE_END} bp（{GENE_STRAND}链）。考虑到转录调控区对基因功能的重要性，在基因体的 strand-aware 上游定义 2 kb 启动子区，启动子区坐标为 {PROMOTER_START}–{PROMOTER_END} bp。单倍型分析区间取基因体与启动子区的并集，即 **Chr{CHR_NUM}:{ANALYSIS_START}–{ANALYSIS_END} bp**，全长约 {TOTAL_LEN_KB} kb。
+- `{GENE_ID}`、`{PRIMARY_TRANSCRIPT}`、`{REFERENCE_BUILD}`、`{ANNOTATION_RELEASE}`；
+- `{CHR}`、`{STRAND}`、`{GENE_START}`、`{GENE_END}`、`{PROMOTER_START}`、`{PROMOTER_END}`、`{ANALYSIS_START}`、`{ANALYSIS_END}`；
+- `{SOURCE_ACCESSION_N}`、`{RETAINED_ACCESSION_N}`、`{RETAINED_PHASED_COPY_N}` 及各群体 retained/source 分母；
+- `{SITE_BAD_RATE}`、`{POST_QC_SNP_N}`、`{POST_QC_INDEL_N}`、`{ALL_HAP_N}`、`{MAJOR_HAP_N}`、`{MAJOR_COPY_N}`；
+- `{TREE_SNP_N}`、`{TREE_TIP_N}`、`{MST_NODE_N}`、`{MST_EDGE_N}`；
+- `{MAPPED_COPY_N}`、`{MAPPING_DENOMINATOR}`、`{CALLABLE_MASK_STATUS}`；
+- `{POPGEN_BROAD_INTERVAL}`、`{POPGEN_LOCAL_INTERVAL}`、各指标的窗口数和 target-overlap range；
+- 实际运行的软件、包、数据库和版本，而不是计划版本。
 
-## 4. 变异位点过滤
+坐标必须注明参考版本和坐标基准。基因与启动子坐标按 strand-aware 规则计算；窗口坐标保留软件原生定义并在 Source Data README 中说明。
 
-从目标区间的 VCF 文件中提取变异位点，使用以下标准对 SNP 进行过滤：
+## 3. `superrice_reference_two_mainfig_v4` 材料与方法结构
 
-- **缺失率（missing rate）< 5%**：剔除在超过 5% 样本中缺失基因型的位点；
-- **最小等位基因频率（MAF）≥ 0.05**：剔除次要等位基因频率低于 5% 的低频位点。
+### 3.1 数据来源、参考版本与分析区间
 
-## 5. 位点质量控制（per-site bad-rate 过滤）
+写明使用万份水稻变异图数据库及其 10,548 份源材料口径，引用数据库原始论文；参考基因组、基因坐标、主转录本、CDS 和 GFF3 注释使用 MSU Rice Genome Annotation Project Release 7（MSU_osa1r7）。报告目标基因、染色体、正负链、基因区间、strand-aware 上游 2 kb 启动子和最终分析区间。
 
-在常规缺失率和 MAF 过滤之后，对每个位点进行额外的质量控制，计算位点坏率（site bad-rate）：
+写明群体归并规则：详细标签映射为 XI、GJ、Or（*Oryza rufipogon*）和 Undefined；不得把信息不足的材料强行归组。说明后续分母来自 retained complete-case cohort。
 
-$$\text{bad-rate} = \frac{N_\text{missing} + N_\text{het}}{N_\text{total}}$$
+### 3.2 变异质量控制、完整材料与单倍型构建
 
-其中 $N_\text{missing}$ 为缺失基因型样本数，$N_\text{het}$ 为杂合基因型样本数，$N_\text{total}$ 为总样本数。水稻为自交物种，栽培稻基因型应以纯合为主，因此高频的杂合位点通常源于测序误差或比对错误，而非真实的生物学信号。以 **bad-rate ≤ 3%** 为阈值，剔除超过该阈值的位点。
+说明从 SNP 与 InDel wide genotype 表提取目标区间。若基因型以 `|` 保存相位，明确未额外运行 Beagle；若存在分析所需的未定相杂合，记录排除或定相规则。
 
-经上述两步过滤后，目标区间内保留 **{POST_QC_VARIANTS} 个高质量 SNP 位点**（过滤前 {PRE_QC_VARIANTS} 个）用于后续单倍型构建。
+定义 site bad-rate、项目 sensitivity audit 选择的阈值、post-QC SNP/InDel 数和完整材料规则。分别报告源材料、retained accessions、phased chromosome copies，以及 XI/GJ/Or/Undefined 的 retained/source 分母与保留率。保留率不均时，将比较限定为 retained cohort。
 
-## 6. 单倍型构建
+以全部批准 post-QC SNP+InDel 等位基因组合定义相位单倍型。对 `superrice_reference_two_mainfig_v4`，major set 使用 phased chromosome-copy `n >= 30`；说明这是显示/汇总阈值，不代表低频单倍型不存在。carrier 检验必须以唯一 accession presence/absence 为统计单位，不能把两条染色体拷贝当作独立重复。
 
-基于目标区间（{ANALYSIS_START}–{ANALYSIS_END} bp）内 {POST_QC_VARIANTS} 个 SNP，对每份样本进行单倍型分型。在单倍型构建中，剔除在目标区间内存在任意杂合（heterozygous）或缺失（missing）基因型的样本，保留基因型完整且纯合的样本（haplotype-retained samples）共 **{HAP_RETAINED_N} 份**。
+### 3.3 主要单倍型网络、全材料样本关系树与地理汇总
 
-根据 SNP 等位基因组合的不同，共识别出 **{HAP_COUNT} 种单倍型**。以样本量 **n ≥ 30** 为 major 单倍型阈值，共有 **{MAJOR_HAP_COUNT} 种 major 单倍型**，覆盖 **{MAJOR_HAP_SAMPLE_N} 份样本**。
+描述 major-only MST：节点为主要单倍型，面积为 phased chromosome-copy count，扇区为群体拷贝组成，边为批准位点上的模式距离；网络只描述关系，不定义年代或祖先方向。
 
-## 7. 单倍型最小生成网络
+描述 locus-level 1-IBS/RapidNJ 样本关系树：tip 为全部 retained accessions，不是 Hap ID；列出 tree SNP 数、距离口径、RapidNJ 版本和交叉核对工具。外环只显示 major diplotype 与 Other diplotypes。若环形图径向分支长度不按比例，必须明示并交付带 branch length 的 Newick。该树不是 genome-wide phylogeny。
 
-基于 {MAJOR_HAP_COUNT} 种 major 单倍型之间的 SNP 差异数（Hamming distance），使用最小生成网络（minimum spanning network，MSN）算法描述单倍型间的进化关系。网络中每个节点代表一种 major 单倍型，节点大小与样本量成比例，节点内的扇形（pie slice）展示各 K5 亚群的样本比例。
+描述地理汇总使用版本化 Original Area 质心表。报告 mapped numerator/denominator/rate；明确区域质心不是 accession sampling coordinates，未可靠映射的记录不能伪造位置。
 
-## 8. 局部区间 IBS/NJ 进化树
+### 3.4 群体遗传与选择消除相关描述性分析
 
-为刻画样本间的遗传距离，利用 PLINK（v1.9）计算样本间的同源一致性（identity-by-state，IBS）距离矩阵。以 1 − IBS 作为遗传距离，对全部 **{TOTAL_SAMPLE_N} 份样本**基于目标区间内经 `--mac 1` 过滤后的 **{POST_QC_VARIANTS} 个 SNP** 构建邻接树（neighbor-joining tree，NJ tree），使用 R 包 `ape` 实现。进化树以环形布局（circular layout）呈现，枝条颜色标注 major 单倍型归属；在目标区间内存在杂合或缺失基因型、未能分配单倍型的样本以中性色（灰色）标注。外环（outer ring）标注 K5 亚群信息。
+区分三个 VCF 角色：正式 post-QC SNP+InDel haplotype VCF、canonical biallelic SNP-only population-genetics VCF 和 tree SNP VCF。客户交付的正式 VCF 不得被后两者替代。
 
-## 9. 群体遗传统计
+写明 VCFtools 版本和实际参数：missingness、MAF 是否使用、Pi、Tajima's D、Weir-Cockerham weighted Fst，以及 `A_vs_B = Pi_A / Pi_B` 和 `log2(Pi_A / Pi_B)` 的方向。分别报告 broad/local 区间，确认二者坐标跨度和窗口数真实不同。
 
-在目标基因周边更宽泛的区域，利用滑动窗口（sliding window）方法计算以下群体遗传统计量，以评估局部遗传多样性与群体分化模式：
+写明 callable-site mask 状态。若 callable-site mask 为 unavailable，Pi 和 Tajima's D 仅为 nominal-window descriptive summary；局部峰谷、Fst 或 Pi ratio 不能单独证明选择、群体历史、驯化或渐渗。
 
-- **核苷酸多样性（Pi，π）**：以 `vcftools --window-pi` 计算，展示各 K5 亚群内的 SNP 多样性水平，图中以 −log₁₀(Pi) 形式呈现；
-- **Tajima's D**：以 `vcftools --TajimaD` 计算，检测中性偏离信号，正值提示平衡选择或群体规模近期缩减（瓶颈效应），负值提示方向性选择（选择清除）或群体近期扩张；
-- **群体间固定指数（Fst）**：以 `vcftools --weir-fst-pop` 计算 Weir & Cockerham 加权 Fst，评估 K5 亚群间的遗传分化；
-- **Pi ratio**：以亚群间 Pi 的比值刻画相对多样性差异，辅助识别特定亚群中的选择信号。
+### 3.5 软件、绘图和质量控制
 
-统计量均以位置坐标为横轴展示，目标基因体及启动子区以浅色高亮带标注。基因 overlapping window（与目标区间存在位置重叠的窗口）的描述性汇总值列于结果表格中，**不作为正式统计检验依据**，仅提供描述性参考。
+列出数据库、参考、命令行软件、Python/R、绘图库、树工具、VCF 工具、PDF 合成工具及实际软件版本。未实际使用的软件不得写入 Methods。
 
-## 10. 地理分布可视化
+说明 Fig1/Fig2 的最终物理尺寸、普通文字下限、panel label 下限、Arial/Times New Roman 字体、可编辑矢量 PDF、600 dpi PNG、字体嵌入、无 Type 3/Helvetica/Symbol、无 `/Image` XObject，以及 native/grayscale/protan/deutan/tritan 人工审阅。机械 QA 必须包括 panel label、PDF 文字框重叠、裁切、字体和 release/ZIP 完整性。
 
-基于各样本的经纬度信息，绘制 major 单倍型和 K5 亚群的地理分布图，直观展示不同单倍型在亚洲水稻种植区的空间分布规律。
+## 4. 结果与分析合同
 
-## 11. 软件与版本
+结果不得写成“图1展示……图2展示……”的摘要。至少按以下顺序分节，并从结果表动态写入实际数字与分母：
 
-| 工具 / 包 | 用途 |
-|-----------|------|
-| bcftools | VCF 过滤与区间提取 |
-| vcftools | missing rate、MAF 过滤；Pi、Tajima's D、Fst 计算 |
-| PLINK v1.9 | IBS 距离矩阵计算 |
-| R（≥ 4.x） | 数据整合、可视化、统计汇总 |
-| R::ape | NJ 树构建 |
-| R::ggtree / ggtreeExtra | 进化树可视化 |
-| R::igraph | 最小生成网络计算 |
-| R::rnaturalearth / sf | 地理底图与分布图 |
-| R::ggplot2 / patchwork | 图件排版 |
+1. 目标区域 post-QC SNP/InDel、retained accessions/phased copies、all haplotypes；
+2. major set、各主要单倍型 copy count/frequency、major coverage 和 promoter contribution；
+3. XI/GJ carrier numerator/denominator、Fisher/BH/Newcombe 结果及 complete-case 限制；
+4. MST nodes/edges、全材料 tree tips/group counts、Original Area mapped numerator/denominator；
+5. target-overlap Pi、Tajima's D、weighted Fst、log2 Pi ratio range 及 callable-mask 限制。
 
----
+每节区分观察、统计关联、可相容的解释和需要额外验证的机制。网络、树、地图和 nominal-window 统计不得升级为已证实的选择、起源、渐渗、因果或育种价值。
 
-> **证据边界说明**：本分析的所有统计图件和数据表格提供的是描述性证据，支持 {GENE_ID} 区间存在局部单倍型结构、地理分布差异及群体多样性/分化特征的描述性判断。Pi、Tajima's D、Fst 和单倍型网络/NJ 树**不能单独作为选择、驯化、渗入或选择性清除的统计学证明**，结论措辞应限定在"候选"或"描述性支持"层面。
+## 5. 图注合同
+
+图注按论文 legend 体例逐 panel 撰写，不用一句话概括整张复合图。
+
+- Fig1 必须逐 panel 定义 a-d：对象、图形编码、统计单位、分母、major threshold、branch-length display、Original Area 限制和 Source Data。
+- Fig2 必须逐 panel 定义 a-h：Pi、Tajima's D、Weir-Cockerham weighted Fst、log2 Pi ratio 的 broad/local 配对；写明群体/比较颜色与线型、窗口坐标、单位、0 线含义、Pi ratio 方向和 callable-site mask 限制。
+- 图注必须能独立解释颜色、线型、点形、节点/点大小、carrier/accession/phased-copy 分母和缺失值；读者不应被迫回到 Methods 才能理解基本编码。
+
+## 6. 参考文献与客户边界
+
+至少引用数据集、参考基因组/注释、RapidNJ、PLINK、VCFtools、Weir-Cockerham 和 Tajima's D 的可核验来源；仅在实际使用时引用其他包或算法。
+
+客户文稿不得出现 `/Users/`、`/home/`、`/Volumes/`、Windows drive、用户名或内部日志路径。客户文稿只报告数据库、文件角色、参考版本、参数和 Source Data 相对位置；绝对路径、SHA256、命令日志和环境记录留在内部 provenance/QA。

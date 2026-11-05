@@ -6,6 +6,10 @@
 
 `rice-research-skills` 是一个面向水稻分子育种、生物信息学、重离子诱变研究、科研写作和可复现分析流程的 Codex skills 集合。它来自本地长期科研工作流的筛选整理，保留了对实际任务有复用价值的技能，并排除了系统 skill、插件缓存、临时测试目录、运行缓存和机器特异性生成文件。
 
+本次更新（2026-11-05）保留现有 49 个技能目录，更新指定源中可找到的 48 个技能。
+服务器、客户和个人笔记库位置已改为调用者提供的配置；缺失的上游高级学术组件及
+`project-audit` 保留情况见 [依赖与快照范围](docs/DEPENDENCIES.md)。
+
 这个仓库适合以下使用者：
 
 - 从事水稻遗传育种、诱变育种、候选基因分析或群体遗传分析的研究人员。
@@ -75,12 +79,24 @@ Codex 会根据每个 `SKILL.md` 的 `name` 和 `description` 判断是否加载
 bash scripts/validate_skills.sh
 ```
 
-该脚本会检查：
+该脚本会检查技能元数据、Python/Shell 语法及实际 Markdown 本地链接，并检查：
 
 - 每个 skill 目录是否包含 `SKILL.md`。
 - `SKILL.md` 是否含有 `name:` 和 `description:`。
 - 仓库中是否残留 `.DS_Store`、`__pycache__`、`*.pyc` 等运行缓存。
 - `skills/` 下是否误放 `temp_tests/` 或 `scratch/` 临时文件。
+
+运行现有功能测试时，先确保 BLAST+ 的 `blastn`、`makeblastdb` 在 PATH 中，再创建本项目的隔离环境并安装测试依赖：
+
+```bash
+python3.13 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements-test.txt
+bash scripts/test_skills.sh
+```
+
+测试使用合成输入，覆盖监控、溯源和引物辅助逻辑；真实数据分析、R 图件及第三方生信工具
+在具体任务中另行验收。安装前备份同名技能，按需选择安装，保留用户已有配置。
 
 维护建议：
 
@@ -96,6 +112,12 @@ bash scripts/validate_skills.sh
 ## English
 
 `rice-research-skills` is a curated collection of Codex skills for rice molecular breeding, bioinformatics, heavy-ion mutagenesis research, scientific writing, and reproducible analysis workflows. It is a selected public snapshot of local research workflows, with system skills, plugin caches, temporary test folders, runtime caches, and machine-specific generated files intentionally excluded.
+
+The 2026-11-05 snapshot retains 49 skill directories and refreshes the 48
+available in the selected source. Host/customer paths and personal vault
+configuration are replaced with caller-provided inputs. See
+[dependency and validation scope](docs/DEPENDENCIES.md), including retained
+`project-audit` and optional upstream ARS requirements.
 
 This repository is intended for:
 
@@ -166,12 +188,20 @@ Before committing changes, run:
 bash scripts/validate_skills.sh
 ```
 
-The script checks that:
+The script checks metadata, Python/Shell syntax and actual local Markdown links,
+as well as the following:
 
 - Every skill directory has a `SKILL.md`.
 - Each `SKILL.md` contains `name:` and `description:`.
 - Runtime caches such as `.DS_Store`, `__pycache__`, and `*.pyc` are absent.
 - Temporary folders such as `temp_tests/` or `scratch/` are not placed under `skills/`.
+
+For shipped functional tests, provide BLAST+ (`blastn` and `makeblastdb`) on PATH
+and use Python 3.13 in a project-local virtual
+environment, install `requirements-test.txt`, then run
+`bash scripts/test_skills.sh`. Tests use synthetic inputs; validate real data,
+R figures and external bioinformatics tools in the actual authorized run.
+Back up same-name installed skills and merge configuration intentionally.
 
 Maintenance guidelines:
 

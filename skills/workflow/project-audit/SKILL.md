@@ -1,7 +1,8 @@
 ---
 name: project-audit
 description: This skill should be used when the user asks to audit a project, review a bioinformatics analysis deliverable, check result traceability, validate reproducibility, or perform a structured project audit across code, results, documentation, methods, and conclusion strength.
-version: 0.1.0
+metadata:
+  version: 0.1.0
 ---
 
 # Project Audit

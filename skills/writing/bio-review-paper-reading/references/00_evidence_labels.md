@@ -17,3 +17,4 @@ Rules:
 - Use `原文未系统展开` when the review only touches a topic lightly.
 - Use `以下为基于原文信息的结构化重构` when the framework is reconstructed rather than explicit.
 - Use `【图表解析受限】` if conceptual figures or tables are unreadable.
+

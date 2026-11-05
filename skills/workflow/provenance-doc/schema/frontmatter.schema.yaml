@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://lunping98.local/provenance-doc/frontmatter.schema.yaml"
+$id: "https://REPLACE_PRIVATE_USER.local/provenance-doc/frontmatter.schema.yaml"
 title: provenance.md front-matter schema
 type: object
 required: [template, status, created_at, sealed_at, owner, project]

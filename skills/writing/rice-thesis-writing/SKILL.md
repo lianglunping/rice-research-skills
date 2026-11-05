@@ -1,6 +1,6 @@
 ---
 name: rice-thesis-writing
-description: This skill should be used when the user asks to write, reorganize, polish, or format Chinese master's or doctoral thesis chapters, especially literature reviews, introductions, abstracts, discussions, conclusions, chapter outlines, reference formatting, or Word-ready正文 in the domain of rice genetics, crop breeding, mutagenesis breeding, heavy-ion mutagenesis, or related bioinformatics research. Also use when the user mentions “学位论文”, “博士论文”, “毕业论文”, “文献综述”, “绪论”, “参考文献格式”, or wants thesis text that can be pasted directly into Word.
+description: "Chinese rice-science thesis drafting, reorganization, revision and formatting. Preserve biological context, evidence levels, citation support and institutional requirements."
 ---
 
 # Rice Thesis Writing

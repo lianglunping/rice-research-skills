@@ -1,8 +1,9 @@
 ---
 name: bio-vcf-basics
-description: View, query, and understand VCF/BCF variant files using bcftools and cyvcf2. Use when inspecting variants, extracting specific fields, or understanding VCF format structure.
-tool_type: cli
-primary_tool: bcftools
+description: "Vcf basics: View, query, and understand VCF/BCF variant files using bcftools and cyvcf2."
+metadata:
+  tool_type: cli
+  primary_tool: bcftools
 ---
 
 ## Version Compatibility
@@ -340,3 +341,12 @@ vcf.close()
 - filtering-best-practices - Filter variants by quality/criteria
 - vcf-manipulation - Merge, concat, intersect VCFs
 - alignment-files/pileup-generation - Generate pileup for calling
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

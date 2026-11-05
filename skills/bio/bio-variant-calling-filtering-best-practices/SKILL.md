@@ -1,8 +1,9 @@
 ---
 name: bio-variant-calling-filtering-best-practices
-description: Comprehensive variant filtering including GATK VQSR, hard filters, bcftools expressions, and quality metric interpretation for SNPs and indels. Use when filtering variants using GATK best practices.
-tool_type: mixed
-primary_tool: bcftools
+description: "Variant calling filtering best practices: Comprehensive variant filtering including GATK VQSR, hard filters, bcftools expressions, and quality metric interpretation for SNPs and indels."
+metadata:
+  tool_type: mixed
+  primary_tool: bcftools
 ---
 
 ## Version Compatibility
@@ -401,3 +402,12 @@ bcftools query -f '%FILTER\n' filtered.vcf | sort | uniq -c
 - variant-calling/gatk-variant-calling - GATK VQSR
 - variant-calling/variant-annotation - Annotation after filtering
 - variant-calling/vcf-statistics - Evaluate filter effects
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

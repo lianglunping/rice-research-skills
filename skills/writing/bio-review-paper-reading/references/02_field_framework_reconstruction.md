@@ -38,3 +38,4 @@ translation_risk:
 ```
 
 Avoid overstating rice relevance when the review mainly covers Arabidopsis, animal systems, or general methods.
+

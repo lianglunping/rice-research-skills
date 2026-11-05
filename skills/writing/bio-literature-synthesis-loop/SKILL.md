@@ -1,6 +1,6 @@
 ---
 name: bio-literature-synthesis-loop
-description: Periodic literature synthesis and retention workflow for biology, genomics, plant breeding, rice, bioinformatics, and mutagenesis reading systems. Use when the user asks for weekly, biweekly, monthly, half-year, yearly, or project-specific summaries from Zotero/Obsidian notes; due-review queues; missing audit detection; topic evidence matrices; recall questions; research seed ranking; reading plans; or dry-run Zotero/Obsidian dashboard updates. Do not use for first-pass deep reading of a single paper, general literature search, Zotero setup, citation export, or Obsidian plugin troubleshooting.
+description: "Literature synthesis loop: Periodic literature synthesis and retention workflow for biology, genomics, plant breeding, rice, bioinformatics, and mutagenesis reading systems."
 ---
 
 # Bio Literature Synthesis Loop
@@ -14,7 +14,15 @@ Use this skill to turn individual literature notes into long-term understanding.
 - Do not use for first-pass deep reading of a review paper; switch to `bio-review-paper-reading`.
 - Do not use for general literature search, Zotero setup, citation export, Obsidian plugin troubleshooting, or PDF parsing configuration.
 - Do not claim to complete a formal systematic review or living systematic review unless actual protocol, search, screening, and update records exist.
-- Do not write to Zotero or Obsidian by default. Produce dry-run write plans unless the user explicitly confirms a write action.
+- Zotero/Obsidian writes require applicable task authorization; default to dry-run plans otherwise. Reuse an existing explicit scoped write instruction without asking for the same approval again.
+
+## Note-vault integration
+
+When this task uses a configured note vault, read the guidance in
+[the Obsidian output contract](references/02_zotero_obsidian_sync_contract.md). Use the actual compatible
+local model, including `gpt-6.1-sol` or `gpt-5.6-sol`; no model service, plugin
+installation or new agent is needed merely to write Markdown. Keep note output
+proportionate, reuse existing folders and preserve the scientific evidence rules.
 
 ## Default Workflow
 
@@ -63,4 +71,9 @@ Before finalizing, verify:
 - Review-paper second-hand claims remain marked as requiring backtracking unless original papers were checked.
 - Every due-review item has `review_next` or a clear scheduling recommendation.
 - Every research seed has ranking rationale and failure risk.
-- Zotero/Obsidian output remains dry-run unless explicit user confirmation exists.
+- Zotero/Obsidian output remains dry-run unless applicable task write authorization exists.
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

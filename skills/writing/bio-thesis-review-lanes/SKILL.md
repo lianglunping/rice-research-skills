@@ -1,6 +1,6 @@
 ---
 name: bio-thesis-review-lanes
-description: This skill should be used when the user asks for reviewer-style critique of biology or bioinformatics thesis/manuscript content, especially external-reviewer, advisor-reviewer, committee-review, pre-defense, major-problem finding, submission readiness, or chapter-level risk checks in rice, molecular biology, genetics, mutagenesis, and omics contexts.
+description: "Thesis review organized by evidence, biological logic, structure and presentation, with actionable revisions and claim-strength limits."
 ---
 
 # Bio Thesis Review Lanes
@@ -68,3 +68,8 @@ Route those to `bio-thesis-workflow`.
 - [references/committee-reviewer.md](references/committee-reviewer.md): degree-thesis lens
 - [references/findings-schema.md](references/findings-schema.md): report structure
 - [examples/review-report-example.md](examples/review-report-example.md): example output
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

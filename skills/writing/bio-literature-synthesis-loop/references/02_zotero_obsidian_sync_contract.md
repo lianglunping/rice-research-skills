@@ -2,6 +2,14 @@
 
 This skill is read-first and dry-run by default.
 
+## Caller-configured note target
+
+Use only the vault path and folder conventions supplied or verified for the
+current task. Inspect existing folders before selecting note locations and
+reuse applicable scoped write authorization. This reference does not activate
+daily logging. Keep the current compatible model; note output alone needs no
+new model service, plugin or agent.
+
 ## Input Sources
 
 Possible sources:

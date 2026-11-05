@@ -1,8 +1,9 @@
 ---
 name: bio-genome-annotation-functional-annotation
-description: Assign GO terms, KEGG orthologs, Pfam domains, and EC numbers to predicted proteins using eggNOG-mapper and InterProScan. Produces functional summaries for downstream pathway and enrichment analysis. Use when adding functional annotation to predicted genes or characterizing protein functions in a new genome.
-tool_type: cli
-primary_tool: eggNOG-mapper
+description: "Genome annotation functional annotation: Assign GO terms, KEGG orthologs, Pfam domains, and EC numbers to predicted proteins using eggNOG-mapper and InterProScan."
+metadata:
+  tool_type: cli
+  primary_tool: eggNOG-mapper
 ---
 
 ## Version Compatibility
@@ -270,3 +271,17 @@ def annotation_summary(merged_df):
 - eukaryotic-gene-prediction - Produces protein sequences for functional annotation
 - pathway-analysis/go-enrichment - Enrichment analysis using GO annotations
 - pathway-analysis/kegg-pathways - Pathway mapping with KEGG orthologs
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

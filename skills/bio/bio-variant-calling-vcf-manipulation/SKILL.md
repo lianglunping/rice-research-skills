@@ -1,8 +1,9 @@
 ---
 name: bio-vcf-manipulation
-description: Merge, concatenate, sort, intersect, and subset VCF files using bcftools. Use when combining variant files, comparing call sets, or restructuring VCF data.
-tool_type: cli
-primary_tool: bcftools
+description: "Vcf manipulation: Merge, concatenate, sort, intersect, and subset VCF files using bcftools."
+metadata:
+  tool_type: cli
+  primary_tool: bcftools
 ---
 
 ## Version Compatibility
@@ -427,3 +428,12 @@ print(f'Unique to sample2: {unique}')
 - filtering-best-practices - Filter variants before manipulation
 - variant-normalization - Normalize before comparing
 - vcf-statistics - Compare statistics after manipulation
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

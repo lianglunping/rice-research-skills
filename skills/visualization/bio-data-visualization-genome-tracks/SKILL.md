@@ -1,8 +1,9 @@
 ---
 name: bio-data-visualization-genome-tracks
-description: Create genome browser-style visualizations showing multiple data tracks (coverage, peaks, genes) using pyGenomeTracks, Gviz, and IGV. Use when visualizing genomic data at specific loci with multiple aligned tracks.
-tool_type: mixed
-primary_tool: pyGenomeTracks
+description: "Data visualization genome tracks: Create genome browser-style visualizations showing multiple data tracks (coverage, peaks, genes) using pyGenomeTracks, Gviz, and IGV."
+metadata:
+  tool_type: mixed
+  primary_tool: pyGenomeTracks
 ---
 
 ## Version Compatibility
@@ -247,3 +248,12 @@ dev.off()
 - genome-intervals/bigwig-tracks - BigWig file handling
 - chip-seq/chipseq-visualization - ChIP-specific tracks
 - hi-c-analysis/hic-visualization - Hi-C contact maps
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

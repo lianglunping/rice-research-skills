@@ -1,8 +1,9 @@
 ---
 name: bio-data-visualization-multipanel-figures
-description: Combine multiple plots into publication-ready multi-panel figures using patchwork, cowplot, or matplotlib GridSpec with shared legends and panel labels. Use when combining multiple plots into publication figures.
-tool_type: mixed
-primary_tool: patchwork
+description: "Data visualization multipanel figures: Combine multiple plots into publication-ready multi-panel figures using patchwork, cowplot, or matplotlib GridSpec with shared legends and panel labels."
+metadata:
+  tool_type: mixed
+  primary_tool: patchwork
 ---
 
 ## Version Compatibility
@@ -271,3 +272,12 @@ fig.savefig('figure1.png', dpi=300, bbox_inches='tight')
 - data-visualization/ggplot2-fundamentals - Individual plots
 - reporting/rmarkdown-reports - Figures in documents
 - differential-expression/de-visualization - DE-specific plots
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

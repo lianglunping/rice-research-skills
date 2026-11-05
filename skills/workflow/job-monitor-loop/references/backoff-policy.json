@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "tiers_seconds": [60, 600, 1800, 3600, 10800, 21600],
+  "normal_checks_to_promote": [3, 2, 2, 2, 2, 2],
+  "progress_caps": [[80, 600], [95, 120], [99, 60]],
+  "eta_fraction": 0.25,
+  "minimum_interval_seconds": 60,
+  "without_reliable_eta_cap_seconds": 3600,
+  "unknown_intervals_seconds": [60, 600],
+  "diagnosed_unknown_intervals_seconds": [60, 600, 1800, 3600],
+  "anomaly_intervals_seconds": [60, 60, 600, 1800, 3600],
+  "maximum_repairs_per_issue": 3,
+  "maximum_repairs_per_run": 6
+}

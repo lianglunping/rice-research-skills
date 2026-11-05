@@ -32,3 +32,4 @@ Adjust intervals based on thesis relevance, active project relevance, and eviden
 - `P1`: likely useful for near-term analysis or writing.
 - `P2`: useful background or future seed.
 - `P3`: archive-level relevance.
+

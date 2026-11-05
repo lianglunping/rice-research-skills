@@ -58,7 +58,7 @@ data, and methodology descriptions must come from session materials.
 
 ### [MATERIAL GAP] handling
 
-> **Tag vocabulary.** The `[MATERIAL GAP]`, `[WEAK EVIDENCE]`, `[GAP]` tags used throughout this protocol are canonically defined in [`shared/compliance_checkpoint_protocol.md#canonical-gap-tag-vocabulary`](../../shared/compliance_checkpoint_protocol.md#canonical-gap-tag-vocabulary). This section describes how the anti-leakage writing-time flag interacts with that vocabulary during manuscript production.
+> **Tag vocabulary.** The `[MATERIAL GAP]`, `[WEAK EVIDENCE]`, `[GAP]` tags used throughout this protocol are canonically defined in `shared/compliance_checkpoint_protocol.md#canonical-gap-tag-vocabulary` (external ARS component; see the dependency notes). This section describes how the anti-leakage writing-time flag interacts with that vocabulary during manuscript production.
 
 When a `[MATERIAL GAP]` is flagged:
 1. The gap is surfaced at the next checkpoint
@@ -81,3 +81,8 @@ When a `[MATERIAL GAP]` is flagged:
 
 - Song, Y. et al. (2026). PaperOrchestra. *arXiv:2604.05018*. Appendix D.4 (Anti-Leakage Prompt).
 - Lu, C. et al. (2026). Towards end-to-end automation of AI research. *Nature* 651, 914-919. — Mode 6 (Methodology fabrication).
+
+This public snapshot does not bundle the external ARS schemas, adapters or design
+specifications named above. Confirm those contracts in the caller’s installation
+before enabling a feature that consumes them; report missing required components
+as a material gap. See the repository dependency notes.

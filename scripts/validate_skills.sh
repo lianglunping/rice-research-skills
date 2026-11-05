@@ -39,4 +39,6 @@ if [[ "$status" -eq 0 ]]; then
   printf 'Skill validation passed.\n'
 fi
 
-exit "$status"
+if [[ "$status" -ne 0 ]]; then exit "$status"; fi
+
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate_bundle.py

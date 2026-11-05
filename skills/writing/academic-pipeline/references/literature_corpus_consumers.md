@@ -2,7 +2,7 @@
 
 **Status**: Released in v3.6.5 (both Phase 1 consumers wired)
 **Applies to**: any agent in this repo that reads `literature_corpus[]` from a Material Passport
-**Authoritative spec**: [`docs/design/2026-04-26-ars-v3.6.5-consumer-integration-design.md`](../../docs/design/2026-04-26-ars-v3.6.5-consumer-integration-design.md)
+**Authoritative spec**: `docs/design/2026-04-26-ars-v3.6.5-consumer-integration-design.md` (external ARS component; see the dependency notes)
 
 ## What this document covers
 
@@ -142,7 +142,7 @@ F4a/b/c are mutually exclusive by trigger. F4d applies only when zero entries de
 **Status**: Wired in v3.6.5
 **Skill**: deep-research
 **Phase**: 1 (literature search and curation)
-**Agent file**: [`deep-research/agents/bibliography_agent.md`](../../deep-research/agents/bibliography_agent.md)
+**Agent file**: `deep-research/agents/bibliography_agent.md` (external ARS component; see the dependency notes)
 
 The deep-research bibliography agent applies the corpus-first flow during its systematic literature search. The PRE-SCREENED block sits inside the Search Strategy section of its Annotated Bibliography output (per the agent's existing Output Format), preceding the existing DATABASES / Inclusion-Exclusion / RESULTS structure.
 
@@ -158,3 +158,8 @@ When `literature_corpus[]` is non-empty and parses cleanly, the agent enters Ste
 The academic-paper literature strategist agent applies the corpus-first flow during its literature search strategy phase. The PRE-SCREENED block sits inside the Search Strategy section of the Literature Search Report (per the agent's existing Output Format), immediately before the `Databases` line. The merged `final_included` set feeds the agent's downstream Annotated Bibliography, Literature Matrix, Research Gap Identification, and Recommended Sources by Paper Section outputs without altering their formats.
 
 When `literature_corpus[]` is non-empty and parses cleanly, the agent enters Step 1 pre-screening, and Step 2 search-fills-gap dispatches the external 4-Layer Progressive Strategy. When the corpus is absent, empty, or fails the minimal shape check, the agent runs its existing 4-Layer external-DB-only flow unchanged (Iron Rule 4 graceful fallback for the failure cases).
+
+This public snapshot does not bundle the external ARS schemas, adapters or design
+specifications named above. Confirm those contracts in the caller’s installation
+before enabling a feature that consumes them; report missing required components
+as a material gap. See the repository dependency notes.

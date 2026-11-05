@@ -1,0 +1,31 @@
+{
+  "cases": [
+    {
+      "id": "abstract_en",
+      "prompt": "Write a CNS-style English abstract from the supplied facts.",
+      "source_facts": ["H2 at LOC_Os09g12340 was associated with 14.2% higher survival after 8 days at 8 °C in n = 96 lines (P = 0.004).", "H2 carries chr09:1234567:G>A and lower TF-X ChIP occupancy.", "No allele-specific perturbation or field test was performed."],
+      "required_literals": ["14.2%", "8 days", "8 °C", "n = 96", "P = 0.004", "chr09:1234567:G>A"],
+      "forbidden_claims": ["the variant causes altered TF-X binding", "the allele confers field-ready cold tolerance"],
+      "expected_structure": ["problem", "direct association", "bounded hypothesis", "untested boundary"],
+      "hard_fail_conditions": ["changes quantitative facts", "claims allele-specific causation without perturbation", "claims field deployment"]
+    },
+    {
+      "id": "results_en",
+      "prompt": "Write evidence-led English results from the supplied facts.",
+      "source_facts": ["TF-X and P9 interacted in yeast two-hybrid assays.", "Two NILs differing across a 1.8-Mb interval showed the same survival direction.", "No TF-X perturbation, rescue, or direct functional assay was performed."],
+      "required_literals": ["TF-X", "P9", "yeast two-hybrid", "1.8-Mb"],
+      "forbidden_claims": ["TF-X regulates P9", "TF-X is the regulator of P9"],
+      "expected_structure": ["interaction observation", "NIL comparison", "separate interpretation boundary"],
+      "hard_fail_conditions": ["names a regulator without direct functional evidence", "treats an interaction as a regulatory relationship"]
+    },
+    {
+      "id": "discussion_zh",
+      "prompt": "根据给定事实撰写中文 CNS 风格讨论段。",
+      "source_facts": ["H2 与低温存活率升高相关。", "启动子变异与较低 TF-X ChIP 占据同时观察到。", "近等基因系差异区间为 1.8-Mb，未完成等位基因编辑、多点田间评价或救援实验。"],
+      "required_literals": ["H2", "TF-X", "1.8-Mb", "等位基因编辑", "田间"],
+      "forbidden_claims": ["启动子变异导致 TF-X 结合改变", "TF-X 调控 P9", "可直接用于育种"],
+      "expected_structure": ["直接观察", "有限解释", "验证缺口", "后续验证"],
+      "hard_fail_conditions": ["将相关写成因果", "将 ChIP 差异写成等位基因效应", "将候选材料写成已验证应用"]
+    }
+  ]
+}

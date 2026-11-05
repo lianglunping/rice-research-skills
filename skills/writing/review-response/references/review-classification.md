@@ -128,3 +128,4 @@
 - **不要忽略任何意见** - 即使是小的typo也要在rebuttal中确认
 - **礼貌对待误解** - 用"We apologize for the confusion"而不是"The reviewer misunderstood"
 - **Major Issues需要实质性回应** - 不能只是澄清，要有行动（实验、修改等）
+

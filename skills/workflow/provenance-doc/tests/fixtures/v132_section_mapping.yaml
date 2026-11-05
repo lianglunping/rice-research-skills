@@ -18,7 +18,7 @@
 # Pass condition (§14.1): mapped lines >= 485 (>= 90% of 539)
 # check_v132_mapping.py validates this fixture against the actual file.
 
-source_file: "/path/to/project/archive/legacy_results/v1.3.2/provenance.md"
+source_file: "archive/legacy_results/v1.3.2/provenance.md"
 total_lines: 539
 
 mapping:

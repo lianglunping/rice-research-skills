@@ -21,14 +21,19 @@ Write from the evidence hierarchy below:
 
 Do not let polished prose outrun the table.
 
-## Paragraph Template
+## Evidence-Led Paragraph Functions
 
-Use this sequence unless the section needs a different order:
+Choose the function that matches the evidence; do not force every paragraph through one rigid template.
 
-1. frame the comparison or analysis target
-2. report the main numerical pattern
-3. note the most important cross-group contrast
-4. state the boundary or caveat
+| Function | Job | Evidence threshold |
+|---|---|---|
+| discovery | define the comparison and report the observed pattern | source table, figure, or manifest |
+| validation | show replication, orthogonal support, or a confirming comparison | independent or orthogonal result |
+| mechanism | connect a tested perturbation to a measured intermediate or phenotype | direct functional evidence |
+| resource | describe a dataset, panel, map, or material that enables later testing | provenance, scope, and limitations |
+| application | state breeding or translational relevance without claiming field readiness | validation status and deployment boundary |
+
+State a local conclusion when it materially follows from the paragraph's evidence. Add a caveat only when a material limitation, dependency, or untested link would otherwise alter interpretation; do not add a formulaic caveat to every paragraph. When `cns_empirical` is active, use the same functions with tighter evidence-to-claim alignment, not shorter wording by default.
 
 ## Claim Strength Bands
 

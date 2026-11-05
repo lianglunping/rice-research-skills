@@ -91,3 +91,4 @@ tags:
 - Weekly note: `YYYY-[W]ww-literature-review.md`
 - Monthly note: `YYYY-MM-literature-review.md`
 - Project note: `{topic}-literature-review.md`
+

@@ -103,7 +103,7 @@ Mode 444 only blocks writes from non-root users that respect filesystem permissi
 
 ## Q11. `check_v132_mapping.py` warns `source file not found locally`
 
-The fixture references `/path/to/project/archive/legacy_results/v1.3.2/provenance.md` — a personal path on the original author's machine.
+The fixture references `archive/legacy_results/v1.3.2/provenance.md` — an intentionally non-canonical example path.
 
 **Fix:** this is expected when running on any other machine. The warning is non-fatal; the script falls back to validating the mapping arithmetic only (covered ≥ 90%) without comparing against the actual file.
 
@@ -123,4 +123,4 @@ If you hit something not in this FAQ:
 
 1. Run `bash "$HOME/.codex/skills/provenance-doc"/tests/e2e/run_all.sh` first — if it fails, the install or contract is broken.
 2. Check the most recent backup at `~/.codex/skills/provenance-doc.backup.*/` to compare.
-3. Review the spec at `/path/to/provenance-doc-design.md` for the canonical contract.
+3. If present, review the project-local `plans/2026-04-30-provenance-doc-design.md`; do not assume a machine-specific absolute path.

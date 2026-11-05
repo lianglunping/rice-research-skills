@@ -1,291 +1,261 @@
 ---
 name: staged-agent-run-protocol
-description: >-
-  Use this skill for complex staged research, bioinformatics, molecular breeding,
-  heavy-ion mutagenesis, reproducible data analysis, long-running pipelines, or
-  tasks that need phase separation, fixed output paths, TODO tracking, QC gates,
-  provenance, checksums, frozen results, HTML navigation, or multi-session Agent
-  handoff. Chinese trigger hints: 阶段化执行, staged run, 每个会话一个阶段,
-  可复现流程, 长任务监控, 固定路径, 质控门禁, provenance, TODO 动态更新.
+description: "Approved research-run execution and recovery with auditable state, provenance, QC gates and frozen outputs. Use for an authorized run, not for planning or ordinary questions."
 ---
 
 # Staged Agent Run Protocol
 
-Version: `0.2.1-rc`
+Execute approved research plans through an auditable local control plane.
+Canonical run-control records are Markdown, TSV, and YAML. Rendered HTML is for
+navigation only and is never the sole source of truth.
 
-Use this skill to turn complex research work into an auditable staged run.
+Use Chinese for human-facing run documents by default. Preserve literal code,
+commands, paths, filenames, field names, IDs, environment names, tool names, and
+status values in English.
 
-Core rule: local protocol Markdown, TSV, and YAML are the canonical run-control sources. HTML is rendered locally for human navigation and is not a source of truth.
+## Execution Boundary
 
-Language rule: Human-facing Markdown and HTML must use Chinese by default. Code, variables, commands, file paths, filenames, table headers, IDs, software names, environment names, and literal status values remain English.
+- Apply this protocol to an approved research plan that needs auditable run
+  control, including ordinary approved research execution and an explicitly
+  invoked or verifiably active three-stage run. It does not itself constrain
+  ordinary task reads, file generation, writes, or agent dispatch.
+- Runtime-policy model roles apply only within an explicit or active three-stage run.
+- Consume an approved plan; do not recreate, debate, or materially redesign it.
+- Bootstrap a run directory only to establish control records, not to reopen
+  scientific planning.
+- Do not repeat approval when all entry conditions pass.
+- Pause only for missing or contradictory approval evidence, execution-critical
+  ambiguity, material drift from the approved scope, or new destructive or
+  external-side-effect authority.
+- Route scientific redesign to multi-agent-bioinformatics-planner and long-job
+  supervision to job-monitor-loop.
 
-## When To Trigger
+Enter execution directly when:
 
-Apply the protocol when the task involves any of these:
+    plan.status == approved
+    approval_evidence is present
+    current request asks to execute, continue, or resume
+    observed inputs, outputs, and scope match the approved plan
 
-- multiple inputs, outputs, scripts, stages, or sessions
-- formal bioinformatics or molecular breeding results
-- paper figures, tables, reports, or archived outputs
-- long-running jobs, background execution, or monitoring
-- remote/server execution with local review, rendering, reporting, or archiving
-- code changes requiring tests and reproducible QA
-- downstream reuse, review, audit, provenance, or handoff
+## Approved Plan Contract
 
-Do not use the full protocol for simple Q&A, translation, light polishing, or one-off explanations with no file artifacts.
+Read the plan completely. Require:
+
+    status
+    scope
+    inputs
+    outputs
+    acceptance_criteria
+    environment
+    assumptions
+    risks
+    approval_evidence
+
+Confirm through read-only checks that referenced paths, environments, and
+acceptance criteria are resolvable. Do not ask again about facts already frozen
+in the approved plan. If a material conflict is found, cite it and stop before
+the affected stage.
 
 ## Profiles
 
-- `lite`: run directory, phase Markdown, TODO, command/input/output/QC records. HTML optional.
-- `standard`: default. Full run directory, phase Markdown, `index.html`, stage provenance, QC report, manifests, commands/jobs/monitor logs.
-- `strict`: paper-core or high-risk work. HTML for every phase/stage, final checksums, frozen outputs, `reproduce.sh`, environment snapshot, final audit.
+- lite: run metadata, stage registry, TODO, command, input/output, and QC records.
+- standard: lite plus provenance, manifests, job/monitor logs, checksums, and
+  local navigation.
+- strict: standard plus frozen outputs, environment snapshot, reproduction
+  entry point, final audit, and release-grade evidence.
 
-## Phase Boundary
+Choose the profile from the approved plan or risk. Do not inflate a small task
+into a strict run without justification.
 
-Default one formal session equals one protocol phase.
+## Core Sources of Truth
 
-- Phase 0 Bootstrap: create run directory and initial metadata only.
-- Phase 1 Analysis: understand context, risks, strategies. Do not execute formal workflow.
-- Phase 2 Plan And Path Freeze: lock paths, stages, QC, commands, monitoring, final outputs. Do not implement full workflow.
-- Phase 3 Execution And Finalization: execute only the approved plan, stage by stage, with QC gates and provenance.
+Keep these records when applicable:
 
-For high-risk, long-running, paper-core, or large file-change tasks, keep Phase 1, Phase 2, and Phase 3 in separate sessions.
+- metadata/run.yaml and metadata/status.yaml;
+- 02_plan/stage_registry.tsv;
+- todo.tsv and todo_history.tsv;
+- path_registry.tsv and files_manifest.tsv;
+- logs/commands.tsv, logs/jobs.tsv, and logs/monitor.tsv;
+- metadata/hosts.tsv and metadata/path_maps.tsv;
+- metadata/env_registry.tsv and metadata/software_registry.tsv;
+- metadata/reference_registry.tsv and metadata/storage_policy.tsv;
+- logs/remote_commands.tsv, logs/remote_jobs.tsv, logs/sync.tsv,
+  logs/install.tsv, and logs/disk_usage.tsv;
+- logs/cleanup_candidates.tsv;
+- 03_execution/final/frozen_outputs.tsv.
+- metadata/coordination.yaml;
+- coordination/agent_assignments.tsv, coordination/integration_events.tsv,
+  and coordination/audit_receipts.tsv;
+- coordination/snapshots/ and coordination/revisions/.
 
-## Required Sources Of Truth
+Keep the local run directory as the canonical control layer. Do not hand-edit a
+rendered HTML page as the only state record.
 
-- `metadata/run.yaml`: static run metadata.
-- `metadata/status.yaml`: current run summary.
-- `02_plan/stage_registry.tsv`: stage status and gate authority.
-- `todo.tsv`: current action items.
-- `todo_history.tsv`: TODO state history.
-- `logs/commands.tsv`: formal command audit log.
-- `logs/jobs.tsv`: long job submissions.
-- `logs/monitor.tsv`: monitoring audit log.
-- `metadata/hosts.tsv`: registered remote/server hosts.
-- `metadata/path_maps.tsv`: remote canonical output to local mirror mappings.
-- `metadata/env_registry.tsv`: registered local and remote formal environments.
-- `metadata/software_registry.tsv`: tool version, executable, and install-source registry.
-- `metadata/reference_registry.tsv`: reference genome, annotation, index, and database registry.
-- `metadata/storage_policy.tsv`: raw/work/scratch/results/mirror retention policy.
-- `logs/remote_commands.tsv`: all formal remote command audit rows.
-- `logs/remote_jobs.tsv`: remote job audit log.
-- `logs/sync.tsv`: remote/local synchronization provenance.
-- `logs/install.tsv`: install, update, and uninstall audit rows.
-- `logs/disk_usage.tsv`: local and remote disk usage checks.
-- `logs/cleanup_candidates.tsv`: cleanup candidates only; not deletion authorization.
-- `monitoring/remote_monitor_plan.md`: remote monitoring and sync policy.
-- `path_registry.tsv`: planned and allowed paths.
-- `files_manifest.tsv`: observed/audited files.
+## Model and Coordination Contract
 
-`index.html` is rendered locally from these files and must not be hand-maintained as the only status record.
+Within an explicit or active three-stage run, load
+`<CODEX_HOME>/policies/three-stage-runtime-v1.json` as the machine-readable
+complement to this contract. Its
+`explicit_skill_natural_autonomy_or_active_run` activation means
+every assignment requires evidence-supported model suitability, terminal assignments cannot reopen,
+and current runtime policy permits at most one active writer. It is not a
+global model permission rule.
 
-The protocol control files live in the local run directory by default. Remote servers may hold remote logs, manifests, checksums, remote scientific outputs, and genuine pipeline reports, but not the primary protocol control layer.
+Within an explicit or active three-stage run, new-run stage leads default to
+`gpt-6-astra` for ANALYZE/REFINE and `gpt-6.1-sol` for EXECUTE, unless explicit
+user model evidence overrides them. Keep the observed root identity distinct
+from the actual stage lead. Delegate only with applicable human authority and
+available tools; unavailable routes pause without silent fallback. Child model
+IDs have no fixed allowlist: current runtime availability and a separate task
+capability assessment establish suitability; neither grants stage or file rights.
+Legacy records keep their prior compatibility semantics. Use the three-stage
+composition contract for evidence schemas and `register_agent_assignment.py`
+with `--runtime-evidence`, `--capability-evidence`, `--workflow-stage`,
+`--delegation-authorized` and `--delegation-evidence` for dynamic child models.
+The registry retains evidence paths and hashes in notes. Root-only canonical
+integration, read-only planning, scope isolation and at most one active writer
+remain mandatory.
 
-## Required Workflow
+When more than one agent participates, register every assignment before work
+starts. Use only `READ_ONLY_REVIEWER`, `STAGING_WRITER`,
+`CANONICAL_INTEGRATOR`, and `AUDITOR`. Root is the sole canonical integrator.
+Reviewers and auditors are read-only. A staging writer may write only under
+`coordination/staging/<assignment_id>/`, and active write scopes must be
+disjoint.
 
-1. If no run exists, initialize it with `scripts/init_agent_run.py`.
-2. At the start of every phase, read `README.md`, `metadata/status.yaml`, `todo.tsv`, and relevant phase outputs.
-3. Use subagents when helpful, but save their outputs under the phase `subagents/` directory and keep main-session decisions authoritative.
-4. Before Phase 3, confirm Phase 2 plan approval and ensure paths, stages, QC criteria, and monitoring plan are registered.
-5. During Phase 3, record every formal command in `logs/commands.tsv`; background jobs also go to `logs/jobs.tsv`.
-6. A required stage may only unblock the next required stage when `gate_status` is `QC_Passed` or `Waived_With_Decision`.
-7. QC failure must create or update a `Blocked` or `Active` TODO and cite evidence.
-8. Final outputs must be checksummed and frozen in `03_execution/final/frozen_outputs.tsv`.
+Each assignment binds to the current `base_revision`. Agent returns must include
+a staged manifest or `return_fingerprint`. Reject stale returns and record the
+decision; do not let agents patch moving canonical files or retry indefinitely.
+Integrate accepted returns sequentially with `record_integration.py`, advancing
+the canonical revision after each accepted change.
 
-## Language Policy
+All coordination TSV updates are locked read-modify-write transactions and
+persistent state replacement is atomic. Locks prevent lost registry updates;
+they do not replace role and scope validation.
 
-- Human-facing Markdown and HTML are Chinese-first by default.
-- Keep code, variables, commands, file paths, filenames, TSV/YAML field names, database identifiers, sample IDs, tool names, environment names, and exact status values in English.
-- Section titles in protocol Markdown should be Chinese unless they are literal protocol names, file names, status values, or command examples.
-- `render_index.py` output should use Chinese labels for human navigation while preserving canonical file paths and table column names.
-- Scientific figure/table text follows the project figure policy; this language rule covers protocol documents and review/report pages.
+## Revision Seal and Audit Receipt
 
-## Remote Execution Layer
+Before final audit, require every assignment and local/remote job to be in a
+terminal state. Take one manifest snapshot, then take a second observation over
+the same canonical scope. Seal only when path, size, mtime-ns, and SHA256 are
+identical and no work is active.
 
-Use the remote layer when heavy compute runs on a server/HPC machine while the local run directory is used for review, rendering, reporting, and archiving. Do not run real remote commands unless the user has explicitly approved the execution phase and the host, path map, stage, environment, software versions, storage policy, logs, and monitoring plan are registered.
+An audit receipt must bind all of:
 
-Remote rules:
+```text
+revision_id + manifest_sha256 + scope_fingerprint + audit_cutoff
+```
 
-- The server-side result is the remote canonical output.
-- The local synchronized copy is a local mirror. It is for viewing, rendering, reporting, handoff, and archive packaging; it is not the canonical source.
-- Protocol navigation HTML (`index.html`, phase HTML, stage HTML, QC HTML) is local-only and must be rendered under the local run directory. It must not be generated on the server, registered as remote canonical output, or used as remote provenance.
-- Server-generated HTML is allowed only when it is a genuine scientific/pipeline output, and then it must be registered as a final/report artifact, checksummed, and synced into `local_results/reports/`.
-- Protocol Markdown (`README.md`, phase Markdown, `stage.md`, `qc_report.md`, `provenance.md`, decisions, assumptions, handoff notes) is local run-control evidence. It should not be registered as remote canonical output.
-- Server-generated Markdown is allowed only when it is a genuine scientific/pipeline report or remote provenance artifact, and then it must be registered, checksummed, and mirrored to `local_results/reports/` or `local_results/provenance/`.
-- Register each server in `metadata/hosts.tsv` with `scripts/register_host.py`.
-- Register each remote/local mapping in `metadata/path_maps.tsv` with `scripts/register_path_map.py`.
-- Register formal local/remote environments in `metadata/env_registry.tsv` with `scripts/register_env.py`.
-- Register key tool versions in `metadata/software_registry.tsv` with `scripts/register_software.py`.
-- Register reference genomes, annotations, indexes, and databases in `metadata/reference_registry.tsv` with `scripts/register_reference.py`.
-- Record every formal remote command in `logs/remote_commands.tsv` with `scripts/log_remote_command.py`.
-- Record remote jobs in `logs/remote_jobs.tsv` with `scripts/log_remote_job.py`. This records provenance only; it does not submit a job.
-- Every synchronization from or to a server must append a row to `logs/sync.tsv` with `scripts/log_sync.py`.
-- `remote_is_canonical` must be `true` and `local_role` must be `local_mirror` for remote output mappings.
-- A local mirror used for final or frozen output must have checksum evidence (`checksum_status=matched`) or an explicit `checksum_mismatch_policy`.
-- Sync provenance should cite checksum files when available through `remote_checksum_path`, `local_checksum_path`, and `provenance_path`.
-- Use `scripts/check_remote_mirror.py` for local mirror checks. It does not connect to remote hosts.
-- Do not overwrite remote canonical outputs from local mirrors unless a Phase 2 plan explicitly permits reverse sync and records the decision.
+Validate the sealed revision immediately before using the receipt. Any later
+canonical change, manifest drift, or scope change invalidates the receipt. Mark
+the reason and re-run only the minimal affected dependency, seal, and audit
+chain. Do not interpret an mtime-only change as scientific drift until its
+semantic equivalence rule has been evaluated.
 
-## Local-Remote Role Contract
+## Execution Workflow
 
-- Local Codex controls the run, edits code, performs small validation, renders protocol navigation HTML/reports, stores provenance summaries, and keeps final local mirrors.
-- Remote servers store raw canonical data, heavy compute outputs, work/scratch files, remote logs, remote environments, references, and remote canonical final outputs.
-- Local mirrors should live under `local_results/` by default.
-- Do not sync `raw/`, `work/`, `scratch/`, large BAM/CRAM/FASTQ, large temporary VCF, or large temporary matrices to local mirrors by default.
-- Final local sync should be whitelist-based: reports, provenance, checksums, QA summaries, frozen manifests, figures, tables, selected final outputs, compressed selected logs, and remote manifest summaries.
+1. Read the approved plan, nearest project rules, current status, TODO, and any
+   prior attempt evidence.
+2. Discover the actual host, project root, environment, executable paths,
+   versions, reference resources, storage policy, and output mappings.
+3. Initialize or resume the run with the bundled scripts. Preserve an existing
+   RUN_ID and attempt history during recovery.
+4. Register stages, paths, environments, software, references, hosts, and
+   remote/local mappings before the affected formal stage.
+5. Execute only approved stages. Record every formal command; record background
+   and remote jobs in their dedicated logs.
+6. Apply stage QC. Unblock the next required stage only when gate_status is
+   QC_Passed or Waived_With_Decision.
+7. On failure, preserve logs and partial outputs, update TODO/status, and follow
+   the approved recovery authority. Do not hide or overwrite a failed attempt.
+8. Quiesce assignments/jobs, take two stable observations, and seal the current
+   canonical revision.
+9. Run audit against that sealed revision and issue a revision-bound receipt.
+10. Freeze accepted outputs with checksums and write a final acceptance report.
 
-From a bioinformatics audit perspective, keep these locally in the run directory:
+## Host and Environment Selection
 
-- Run-control Markdown/YAML/TSV: `README.md`, `TODO.md`, phase docs, stage docs, decisions, assumptions, status, TODO, stage registry, path maps, env/software/reference/storage registries.
-- Provenance summaries: command logs, remote command logs, job/monitor/sync/install/disk logs, checksum summaries, frozen output manifests, cleanup candidates.
-- Human-review artifacts: local `index.html`, local phase/stage HTML, final report, QC summaries, selected reports.
-- Final lightweight scientific outputs: figures (`pdf/png`), tables (`tsv/xlsx`), selected small final VCF/CSV/TSV, compressed selected logs, remote manifest summaries.
-- Code and configuration snapshots needed to reproduce the run: scripts, configs, environment lock/export summaries, tool-version files.
+- Use the host specified by the plan, project configuration, registry, or user.
+- Discover missing host facts with read-only checks when possible.
+- Never default an unspecified server to a named host. If multiple choices
+  would change outputs or cost, report the ambiguity before execution.
+- Use the project environment and lock/config files named in the plan.
+- Conda/mamba, uv, containers, modules, or project-specific environments are
+  all valid when they are the approved or existing project mechanism.
+- Do not create, rebuild, install, or upgrade an environment unless the approved
+  scope includes it.
+- Record the observed executable, version, environment identifier, and relevant
+  lock or export evidence for formal outputs.
 
-Do not keep these locally by default:
+## Remote Execution
 
-- Raw FASTQ/BAM/CRAM, full reference genomes, large indexes, large intermediate VCF/BCF, temporary matrices, work chunks, scratch directories, scheduler working directories, or full remote logs.
+Enable the remote layer only when the approved plan uses it.
 
-## HTML Placement Policy
-
-- `index.html` is always local: `{run_dir}/index.html`.
-- Phase/stage navigation HTML, when generated, is local: `{run_dir}/00_brief/*.html`, `{run_dir}/01_analysis/*.html`, `{run_dir}/02_plan/*.html`, `{run_dir}/03_execution/stages/*/*.html`.
-- Remote servers must not be the primary location for protocol navigation HTML. Server-side records should be Markdown, TSV, YAML, logs, checksums, manifests, and remote scientific outputs.
-- Do not add protocol navigation HTML to `metadata/path_maps.tsv`; it is not a remote canonical output and does not need remote/local mapping.
-- If a remote pipeline produces HTML as a real result, classify it as `report_artifact` or `final_report_artifact`, not `index_html` or navigation HTML, and mirror it to `local_results/reports/` with checksum evidence.
-
-## Markdown Placement Policy
-
-- Protocol Markdown is local: `{run_dir}/README.md`, `{run_dir}/00_brief/brief.md`, `{run_dir}/01_analysis/analysis.md`, `{run_dir}/02_plan/plan.md`, `{run_dir}/03_execution/execution.md`, `{run_dir}/03_execution/stages/*/{stage.md,qc_report.md,provenance.md}`, and `{run_dir}/docs/*.md`.
-- Do not map protocol Markdown through `metadata/path_maps.tsv`; it is already part of the local control plane.
-- Remote Markdown is allowed only as a scientific report artifact or remote provenance artifact, not as the primary phase/stage control document.
-- Mirror remote report Markdown to `local_results/reports/`; mirror remote provenance Markdown to `local_results/provenance/`.
-- A remote `.md` artifact used in final reporting must have checksum evidence or an explicit mismatch policy, the same as other final local mirrors.
-
-## Host Selection: sxyH3/sxyH2
-
-- Use `host_id=sxyH3` and `host_id=sxyH2`; keep `host_id` aligned with the ssh alias.
-- If the user says `sxyH3`, use `sxyH3`. If the user says `sxyH2`, use `sxyH2`.
-- If the user only says "server", default to `sxyH3` and record the assumption in `docs/assumptions.md`.
-- If both hosts are used, Phase 2 must assign `host_id` by stage. A single stage must not silently span hosts.
-- Host changes during Phase 3 require a decision record and updated path maps.
-
-## Environment And Version Governance
-
-- Formal outputs must not be generated by unregistered environments or tools.
-- Prefer local `uv` for report/render/check scripts and all protocol Markdown/HTML rendering; record `uv`, Python path/version, lock file, and lock checksum when used for formal outputs.
-- Remote formal commands should use a registered `env_id`, explicit environment path, executable path, and observed version evidence.
-- Do not use `base`, `latest`, `current`, `test`, `new`, or other ambiguous `env_id` values.
-- Install/update/remove actions must be planned in Phase 2 and recorded in `logs/install.tsv`; update `env_registry.tsv` and `software_registry.tsv` afterward.
-- Formal command provenance should record `which` evidence, version command output, PATH-sensitive assumptions, and lock/export files.
-
-## Storage And Cleanup Governance
-
-- Register raw, work, scratch, results, logs, env, reference, and local mirror storage policy in `metadata/storage_policy.tsv` when remote compute is enabled.
-- Remote raw/reference/final/frozen outputs are never deleted automatically.
-- Work, scratch, deprecated envs, failed partial syncs, and duplicate mirrors may only become cleanup candidates.
-- Cleanup planning writes `logs/cleanup_candidates.tsv` and `03_execution/final/cleanup_plan.md`; it does not authorize deletion.
-- Any real delete, overwrite, env rebuild, or path migration requires explicit user approval and a logged command.
-
-## Remote Phase 3 Stage Order
-
-When remote compute is enabled, Phase 3 starts with `00_remote_preflight`, then normally proceeds:
-
-1. `00_remote_preflight`
-2. `01_register_remote_paths`
-3. `02_prepare_remote_environment`
-4. `03_upload_or_validate_raw_data`
-5. `04_run_remote_pipeline`
-6. `05_remote_qc`
-7. `06_freeze_remote_outputs`
-8. `07_sync_final_to_local`
-9. `08_local_final_qc`
-10. `09_cleanup_plan_only`
-
-`00_remote_preflight` checks connectivity, host identity, user, working directory, disk/quota status, project roots, package managers, Python, and shell context. It must not run formal analysis.
+- Treat server-side scientific outputs as remote canonical outputs and local
+  synchronized copies as mirrors.
+- Keep protocol Markdown, YAML, TSV, and navigation HTML in the local control
+  directory.
+- Register each host and remote/local path mapping.
+- Record remote commands, jobs, synchronization events, checksum status, and
+  attempt identifiers.
+- Whitelist final synchronization. Do not mirror raw FASTQ/BAM/CRAM, large
+  references, work directories, or scratch data unless explicitly required.
+- Do not reverse-sync over canonical remote outputs unless the approved plan
+  expressly permits it.
+- Select only the remote preflight, environment, pipeline, QC, freeze, sync, and
+  local-QC stages that apply. Do not create irrelevant stages mechanically.
 
 ## Long Jobs
 
-For jobs expected to exceed 10 minutes:
+- Submit long-running work in the background and retain job IDs, logs, output
+  paths, and expected checkpoints.
+- Use job-monitor-loop for staged backoff, evidence classification, and bounded
+  recovery.
+- Record each attempt under the same logical RUN_ID when recovering an approved
+  run; preserve failed-attempt evidence.
+- Do not use terminal scrollback or process presence as the only completion
+  evidence.
 
-- submit in the background, not a foreground interactive session
-- register the job in `logs/jobs.tsv`
-- monitor with staged backoff: 1 minute x3, then 10 minutes x3, then 30 minutes
-- on anomaly, reset to 1 minute checks and write an anomaly TODO
-- use the bundled `scripts/monitor_job.py` for local PID/log/output checks, or the existing `job-monitor-loop` skill for remote/wrapper/scheduler monitoring
-- for remote jobs, record status checks and sync events in canonical TSV files; do not rely on terminal scrollback or an HTML page as the only evidence
-- remote monitoring must include job status, log growth, expected outputs/checkpoints, disk usage, error keywords, and runtime limits
+## Acceptance and Cleanup
+
+Accept completion only when all applicable gates pass:
+
+- expected terminal state;
+- expected artifacts and schema/content checks;
+- task-specific semantic QA;
+- command, environment, parameter, and provenance records;
+- checksums or manifest evidence;
+- source-input immutability or explicitly documented authorized change.
+- a current sealed revision and valid audit receipt when audit applies.
+
+Cleanup planning does not authorize deletion. Register cleanup candidates, and
+delete only task-owned temporary artifacts or targets explicitly authorized by
+the user. Never delete raw inputs, references, final outputs, or failed-attempt
+evidence automatically.
 
 ## Bundled Resources
 
-- `references/protocol_v0.1.md`: full protocol specification.
-- `templates/staged_agent_run_protocol/`: empty run templates and CSS.
-- `scripts/init_agent_run.py`: create a run directory.
-- `scripts/render_index.py`: render local `index.html` from canonical sources.
-- `scripts/check_manifest.py`: check required protocol files and stage artifacts.
-- `scripts/hash_outputs.py`: write checksums for files.
-- `scripts/register_stage.py`: add/update `stage_registry.tsv`.
-- `scripts/update_todo.py`: create/update TODO rows with history.
-- `scripts/validate_gate.py`: validate stage gate evidence before continuation.
-- `scripts/write_command_log.py`: append command audit rows.
-- `scripts/freeze_outputs.py`: freeze final outputs with checksums.
-- `scripts/monitor_job.py`: local long-job monitor with backoff state.
-- `scripts/register_host.py`: add/update a remote host record.
-- `scripts/register_path_map.py`: add/update a remote canonical to local mirror mapping.
-- `scripts/register_env.py`: add/update a formal environment record.
-- `scripts/register_software.py`: add/update a tool version record.
-- `scripts/register_reference.py`: add/update a reference data record.
-- `scripts/register_storage_policy.py`: add/update raw/work/scratch/results/mirror retention policy.
-- `scripts/log_remote_command.py`: append remote command provenance without executing it.
-- `scripts/log_remote_job.py`: append remote job provenance without submitting a job.
-- `scripts/log_sync.py`: append remote/local sync provenance.
-- `scripts/log_install.py`: append install/update/remove provenance.
-- `scripts/log_disk_usage.py`: append disk usage evidence.
-- `scripts/make_cleanup_plan.py`: register cleanup candidates without deleting files.
-- `scripts/remote_preflight.py`: create remote preflight artifacts and command template without connecting.
-- `scripts/check_remote_mirror.py`: validate local mirror records without remote connections.
-
-## Minimal Commands
-
-```bash
-python3 "$HOME/.codex/skills/staged-agent-run-protocol/scripts/init_agent_run.py" \
-  --task-name rice_mutation_screening \
-  --root agent_runs \
-  --profile standard
-
-python3 "$HOME/.codex/skills/staged-agent-run-protocol/scripts/render_index.py" \
-  --run-dir agent_runs/2026-05-12_rice_mutation_screening
-
-python3 "$HOME/.codex/skills/staged-agent-run-protocol/scripts/check_manifest.py" \
-  --run-dir agent_runs/2026-05-12_rice_mutation_screening
-```
-
-Remote layer examples:
-
-```bash
-python3 "$HOME/.codex/skills/staged-agent-run-protocol/scripts/register_host.py" \
-  --run-dir agent_runs/2026-05-12_rice_mutation_screening \
-  --host-id hpc1 \
-  --hostname login.example.edu \
-  --access-mode manual \
-  --scheduler slurm
-
-python3 "$HOME/.codex/skills/staged-agent-run-protocol/scripts/register_path_map.py" \
-  --run-dir agent_runs/2026-05-12_rice_mutation_screening \
-  --path-map-id map_stage1_outputs \
-  --host-id hpc1 \
-  --remote-path /remote/project/results/stage1 \
-  --local-path mirrors/hpc1/stage1 \
-  --checksum-mismatch-policy investigate_before_freeze
-
-python3 "$HOME/.codex/skills/staged-agent-run-protocol/scripts/log_sync.py" \
-  --run-dir agent_runs/2026-05-12_rice_mutation_screening \
-  --host-id hpc1 \
-  --path-map-id map_stage1_outputs \
-  --checksum-status matched
-```
-
-## Related Skills
-
-- Use `provenance-doc` for deeper sealed provenance practices.
-- Use `job-monitor-loop` for remote, scheduler, tmux, or wrapper-managed long jobs.
-- Use `handover` before `/clear` or session transfer when the current run state is not fully captured.
+- Use scripts/init_agent_run.py to initialize a run.
+- Use scripts/register_stage.py, update_todo.py, and validate_gate.py for stage
+  and gate control.
+- Use scripts/write_command_log.py and the log_remote_* scripts for provenance.
+- Use scripts/register_host.py, register_path_map.py, register_env.py,
+  register_software.py, register_reference.py, and register_storage_policy.py
+  for registries.
+- Use scripts/hash_outputs.py, freeze_outputs.py, check_manifest.py, and
+  check_remote_mirror.py for final evidence.
+- Use scripts/register_agent_assignment.py before dispatch,
+  scripts/record_integration.py for sequential canonical integration,
+  scripts/snapshot_revision.py for snapshot/seal/verify, and
+  scripts/audit_receipt.py for issue/validate/invalidate.
+- Use scripts/monitor_job.py for local job checks and job-monitor-loop for
+  remote, scheduler, wrapper, or automation-based supervision.
+- Treat references/protocol_v0.1.md and
+  references/staged_agent_run_protocol_v0.1_revised.md as legacy field/schema
+  references only. This `SKILL.md` is the sole authority for triggering,
+  approval, scope, profile, host/environment selection, path expansion, safety,
+  and acceptance. Do not load those references to decide those matters. If a
+  legacy field definition is needed, ignore any conflicting claim of external
+  policy authority, mandatory replanning, repeated approval, or Phase 3 path
+  self-authorization. A new output root, external path, formal output class, or
+  other material drift still requires plan support or explicit user authority.

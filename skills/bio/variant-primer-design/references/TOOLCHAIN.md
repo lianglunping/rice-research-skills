@@ -5,7 +5,7 @@
 The skill ships a dedicated environment bootstrap script:
 
 ```bash
-cd /path/to/codex/skills/variant-primer-design
+cd "${CODEX_HOME:?Set CODEX_HOME to the Codex configuration root}/skills/variant-primer-design"
 bash scripts/bootstrap_env.sh
 ```
 

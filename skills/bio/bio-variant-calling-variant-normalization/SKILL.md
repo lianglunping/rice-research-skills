@@ -1,8 +1,9 @@
 ---
 name: bio-variant-normalization
-description: Normalize indel representation and split multiallelic variants using bcftools norm. Use when comparing variants from different callers or preparing VCF for downstream analysis.
-tool_type: cli
-primary_tool: bcftools
+description: "Variant normalization: Normalize indel representation and split multiallelic variants using bcftools norm."
+metadata:
+  tool_type: cli
+  primary_tool: bcftools
 ---
 
 ## Version Compatibility
@@ -323,3 +324,12 @@ print(f'Percentage: {multiallelic/total*100:.1f}%')
 - filtering-best-practices - Filter after normalization
 - vcf-manipulation - Compare normalized VCFs
 - variant-annotation - Annotate normalized variants
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

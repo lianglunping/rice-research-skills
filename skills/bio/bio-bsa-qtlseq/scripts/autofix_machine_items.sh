@@ -35,7 +35,7 @@ find . -type f ! -name 'MANIFEST.*' | sort | xargs sha256sum > /tmp/sha.body
 log "扫描并替换内部路径"
 while IFS= read -r f; do
     [ -f "$f" ] || continue
-    sed -i.bak 's|/home/[a-z0-9]*/\([a-zA-Z0-9_-]*\)|${BSA_ROOT}/\1|g; s|sxyH3:|remote:|g' "$f" 2>/dev/null || true
+    sed -i.bak 's|/home/[a-z0-9]*/\([a-zA-Z0-9_-]*\)|${BSA_ROOT}/\1|g; s|REPLACE_HOST:|remote:|g' "$f" 2>/dev/null || true
     rm -f "$f.bak"
 done < <(find . -maxdepth 2 \( -name '*.md' -o -name '*.sh' -o -name '*.py' -o -name '*.R' -o -name '*.yml' -o -name '*.yaml' \) 2>/dev/null)
 

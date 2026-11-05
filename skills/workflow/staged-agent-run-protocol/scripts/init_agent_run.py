@@ -8,13 +8,13 @@ from datetime import date
 from pathlib import Path
 
 from sar_utils import (
-    CLEANUP_CANDIDATE_HEADER, COMMAND_HEADER, DISK_USAGE_HEADER, ENV_HEADER,
-    FILES_HEADER, HOST_HEADER, INSTALL_HEADER, JOB_HEADER, MONITOR_HEADER,
+    AGENT_ASSIGNMENT_HEADER, AUDIT_RECEIPT_HEADER, CLEANUP_CANDIDATE_HEADER,
+    COMMAND_HEADER, DISK_USAGE_HEADER, ENV_HEADER, FILES_HEADER, HOST_HEADER,
+    INSTALL_HEADER, INTEGRATION_EVENT_HEADER, JOB_HEADER, MONITOR_HEADER,
     PATH_HEADER, PATH_MAP_HEADER, PROTOCOL_NAME, PROTOCOL_VERSION, QC_HEADER,
     REFERENCE_HEADER, REMOTE_COMMAND_HEADER, REMOTE_JOB_HEADER,
     SOFTWARE_HEADER, STAGE_HEADER, STORAGE_POLICY_HEADER, SYNC_HEADER,
-    TODO_HEADER, TODO_HISTORY_HEADER, ensure_tsv, now, slugify,
-    write_simple_yaml,
+    TODO_HEADER, TODO_HISTORY_HEADER, ensure_tsv, now, slugify, write_simple_yaml,
 )
 
 
@@ -48,6 +48,8 @@ def main() -> int:
         "assets/figures", "assets/tables", "local_results/figures",
         "local_results/tables", "local_results/reports",
         "local_results/checksums", "local_results/provenance",
+        "coordination/staging", "coordination/snapshots",
+        "coordination/revisions",
     ]
     for item in dirs:
         (run_dir / item).mkdir(parents=True, exist_ok=True)
@@ -81,6 +83,14 @@ def main() -> int:
         "next_required_action": "Start Phase 1 Analysis",
         "blocked": "false",
         "blocked_reason": "",
+    })
+    write_simple_yaml(run_dir / "metadata/coordination.yaml", {
+        "coordination_epoch": 0,
+        "canonical_revision": "r0000",
+        "sealed_revision": "",
+        "sealed_scope_fingerprint": "",
+        "last_manifest_sha256": "",
+        "last_updated": now(),
     })
 
     write(run_dir / "README.md", f"""# Agent Run: {args.task_name}
@@ -201,6 +211,9 @@ outputs、environment、software versions、storage policy 和 disk checks 已�
     ensure_tsv(run_dir / "logs/install.tsv", INSTALL_HEADER)
     ensure_tsv(run_dir / "logs/disk_usage.tsv", DISK_USAGE_HEADER)
     ensure_tsv(run_dir / "logs/cleanup_candidates.tsv", CLEANUP_CANDIDATE_HEADER)
+    ensure_tsv(run_dir / "coordination/agent_assignments.tsv", AGENT_ASSIGNMENT_HEADER)
+    ensure_tsv(run_dir / "coordination/integration_events.tsv", INTEGRATION_EVENT_HEADER)
+    ensure_tsv(run_dir / "coordination/audit_receipts.tsv", AUDIT_RECEIPT_HEADER)
     ensure_tsv(run_dir / "03_execution/final/frozen_outputs.tsv", [
         "file_id", "path", "file_role", "stage_id", "md5", "sha256",
         "size_bytes", "frozen_time", "freeze_decision_id", "qc_status", "notes",

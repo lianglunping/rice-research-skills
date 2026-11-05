@@ -1,11 +1,6 @@
 ---
 name: handover
-description: >-
-  Use this skill when the user asks for handover, session handoff, context
-  preservation, clear-safe state capture, updating HANDOVER.md, saving current
-  progress before /clear, or preparing a next-session restore prompt. Chinese
-  trigger hints: 交接, 工作交接, 保存当前进度, 更新 HANDOVER.md, 清理上下文前持久化,
-  新会话继续, 防止 clear 后丢失信息.
+description: "Task handoff and resumable progress records: capture authoritative paths, decisions, completed checks, current state and remaining work."
 ---
 
 # Handover

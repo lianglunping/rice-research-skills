@@ -95,13 +95,13 @@ git branch -d release/v1.0.0
 # Merge 冲突处理
 git merge feature/xxx
 # 编辑冲突文件...
-git add <file>
+git add "<file>"
 git commit
 
 # Rebase 冲突处理
 git rebase develop
 # 编辑冲突文件...
-git add <file>
+git add "<file>"
 git rebase --continue
 
 # 放弃合并
@@ -129,4 +129,4 @@ git stash pop
 # 查看文件修改
 git diff
 git diff --staged
-git log -p -- <file>
+git log -p -- "<file>"

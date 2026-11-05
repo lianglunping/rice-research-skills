@@ -2,16 +2,40 @@
 from __future__ import annotations
 
 import csv
+import fcntl
 import hashlib
 import html
+import json
 import os
 import re
 import sys
+import tempfile
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 PROTOCOL_NAME = "staged_agent_run_protocol"
 PROTOCOL_VERSION = "0.2.1-rc"
+POLICY_NAME = "three-stage-runtime-v1.json"
+
+
+def runtime_policy_path(explicit: Optional[str] = None) -> Path:
+    """Resolve explicit, installed, then repository policy locations."""
+    if explicit:
+        return Path(explicit).expanduser()
+    configured = os.environ.get("CODEX_HOME")
+    codex_home = Path(configured).expanduser() if configured else Path.home() / ".codex"
+    installed = codex_home / "policies" / POLICY_NAME
+    if installed.is_file():
+        return installed
+    repository = Path(__file__).resolve().parents[3] / "runtime" / "policies" / POLICY_NAME
+    return repository if repository.is_file() else installed
+
+
+def runtime_policy(explicit: Optional[str] = None) -> dict:
+    with runtime_policy_path(explicit).open(encoding="utf-8") as handle:
+        return json.load(handle)
 
 TODO_HEADER = [
     "todo_id", "phase", "stage_id", "title", "status", "priority", "owner",
@@ -136,6 +160,83 @@ FROZEN_HEADER = [
     "size_bytes", "frozen_time", "freeze_decision_id", "qc_status", "notes",
 ]
 CHECKSUM_HEADER = ["path", "size_bytes", "md5", "sha256", "time"]
+AGENT_ASSIGNMENT_HEADER = [
+    "assignment_id", "agent_path", "parent_agent", "role", "model",
+    "base_revision", "read_scope", "write_scope", "forbidden_paths",
+    "expected_outputs", "status", "started_time", "finished_time",
+    "return_fingerprint", "notes",
+]
+FINDINGS_HEADER = ["finding_id", "severity", "status", "gate", "evidence_path"]
+INTEGRATION_EVENT_HEADER = [
+    "event_id", "assignment_id", "base_revision",
+    "canonical_revision_before", "canonical_revision_after",
+    "staged_manifest_sha256", "decision", "reason", "time",
+    "integrator", "notes",
+]
+REVISION_MANIFEST_HEADER = [
+    "revision_id", "path", "file_role", "size_bytes", "modified_time_ns",
+    "sha256", "semantic_fingerprint", "equivalence_rule",
+    "source_assignment_id", "status", "notes",
+]
+AUDIT_RECEIPT_HEADER = [
+    "receipt_id", "audit_type", "revision_id", "manifest_sha256",
+    "scope_fingerprint", "audit_cutoff", "auditor", "verdict",
+    "finding_fingerprint", "gate_fingerprint", "gate_statuses", "auditor_assignment_id", "audit_report_path",
+    "audit_report_sha256", "findings_path", "findings_sha256", "valid_status", "invalidated_by", "notes",
+]
+
+
+def validate_model_for_role(model: str, role: str, runtime_evidence=None,
+                            capability_evidence=None) -> bool:
+    """Dynamic evidence takes precedence; no evidence preserves legacy checks."""
+    if runtime_evidence is not None or capability_evidence is not None:
+        # Resolve the sibling skill rather than a global policy-dependent import.
+        from importlib.util import spec_from_file_location, module_from_spec
+        path = Path(__file__).resolve().parents[2] / "three-stage-complex-workflow/scripts/model_routing.py"
+        spec = spec_from_file_location("three_stage_model_routing", path)
+        module = module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.model_supports_role(model, role, runtime_evidence, capability_evidence)
+    return bool(model and role in runtime_policy().get("model_roles", {}).get(model, []))
+
+
+def validate_assignment_model(assignment: dict) -> bool:
+    """Recheck registered dynamic evidence, retaining legacy static semantics."""
+    notes = assignment.get("notes", "")
+    if "model_evidence=" not in notes:
+        return validate_model_for_role(assignment.get("model", ""), assignment.get("role", ""))
+    try:
+        evidence = json.loads(notes.rsplit("model_evidence=", 1)[1])
+        if evidence["stage"] not in {"ANALYZE", "REFINE", "EXECUTE"}:
+            return False
+        role = assignment.get("role", "")
+        if evidence["stage"] != "EXECUTE" and role not in {"READ_ONLY_REVIEWER", "AUDITOR"}:
+            return False
+        inputs = []
+        for key in ("runtime", "capabilities"):
+            raw = Path(evidence[key]["path"]).read_bytes()
+            if hashlib.sha256(raw).hexdigest() != evidence[key]["sha256"]:
+                return False
+            inputs.append(json.loads(raw))
+        if assignment.get("agent_path") not in {"root", "/root"}:
+            if (evidence["delegation_authorized"] is not True
+                    or not evidence["delegation_evidence"]
+                    or inputs[0].get("delegation_tool_available") is not True):
+                return False
+        return validate_model_for_role(assignment.get("model", ""), role, *inputs)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        return False
+
+
+def ready_from_findings(findings: list[dict[str, str]], gates: dict[str, str]) -> bool:
+    """Ready requires all gates verified and no unresolved Critical or Major."""
+    if not gates or any(value != "verified" for value in gates.values()):
+        return False
+    return not any(
+        row.get("severity") in {"Critical", "Major"}
+        and row.get("status", "").lower() == "unresolved"
+        for row in findings
+    )
 
 VALID_TODO_STATUSES = {"Pending", "Active", "Blocked", "Done", "Skipped", "Cancelled", "Running"}
 VALID_STAGE_STATUSES = {
@@ -170,10 +271,34 @@ def read_simple_yaml(path: Path) -> dict[str, str]:
     return data
 
 
-def write_simple_yaml(path: Path, data: dict[str, object]) -> None:
+@contextmanager
+def file_lock(path: Path):
+    """Serialize a complete read-modify-write transaction for a control file."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.with_name(path.name + ".lock")
+    with lock_path.open("a+", encoding="utf-8") as lock_handle:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+
+
+def _atomic_text_write(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        mode="w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.",
+        suffix=".tmp", delete=False,
+    ) as handle:
+        handle.write(text)
+        temp_path = Path(handle.name)
+    os.replace(temp_path, path)
+
+
+def write_simple_yaml(path: Path, data: dict[str, object]) -> None:
     lines = [f"{key}: {'' if value is None else value}" for key, value in data.items()]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with file_lock(path):
+        _atomic_text_write(path, "\n".join(lines) + "\n")
 
 
 def ensure_tsv(path: Path, header: list[str]) -> None:
@@ -190,19 +315,39 @@ def read_tsv(path: Path) -> list[dict[str, str]]:
 
 
 def append_tsv(path: Path, header: list[str], row: dict[str, object]) -> None:
-    ensure_tsv(path, header)
-    with path.open("a", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=header, delimiter="\t", extrasaction="ignore")
-        writer.writerow({key: "" if row.get(key) is None else row.get(key, "") for key in header})
+    with file_lock(path):
+        ensure_tsv(path, header)
+        with path.open("a", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=header, delimiter="\t", extrasaction="ignore")
+            writer.writerow({key: "" if row.get(key) is None else row.get(key, "") for key in header})
 
 
-def write_tsv(path: Path, header: list[str], rows: list[dict[str, object]]) -> None:
+def _write_tsv_unlocked(path: Path, header: list[str], rows: list[dict[str, object]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
+    with tempfile.NamedTemporaryFile(
+        mode="w", encoding="utf-8", newline="", dir=path.parent,
+        prefix=f".{path.name}.", suffix=".tmp", delete=False,
+    ) as handle:
         writer = csv.DictWriter(handle, fieldnames=header, delimiter="\t", extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow({key: "" if row.get(key) is None else row.get(key, "") for key in header})
+        temp_path = Path(handle.name)
+    os.replace(temp_path, path)
+
+
+def write_tsv(path: Path, header: list[str], rows: list[dict[str, object]]) -> None:
+    with file_lock(path):
+        _write_tsv_unlocked(path, header, rows)
+
+
+def update_tsv(path: Path, header: list[str], mutator) -> list[dict[str, object]]:
+    """Atomically read, validate, mutate, and replace a TSV control record."""
+    with file_lock(path):
+        rows: list[dict[str, object]] = list(read_tsv(path))
+        updated = mutator(rows)
+        _write_tsv_unlocked(path, header, updated)
+        return updated
 
 
 def validate_tsv_header(path: Path, expected: list[str]) -> list[str]:

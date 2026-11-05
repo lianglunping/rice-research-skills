@@ -1,4 +1,4 @@
 interface:
   display_name: "Bio Thesis Workflow"
-  short_description: "Write and polish biology thesis content from Word, Markdown, and result artifacts."
-  default_prompt: "Use the bio thesis workflow: route to one writing module, keep claims evidence-bounded, preserve identifiers and numbers, and support Word plus Markdown outputs."
+  short_description: "Evidence-bounded biology thesis and manuscript writing"
+  default_prompt: "Use $bio-thesis-workflow to route one writing module, preserve evidence and identifiers, and apply CNS style only when explicitly requested."

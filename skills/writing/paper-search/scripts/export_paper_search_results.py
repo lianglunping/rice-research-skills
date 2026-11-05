@@ -7,12 +7,13 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import platform
 import re
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Optional
 
 import openpyxl
 import yaml
@@ -164,7 +165,9 @@ def write_xlsx(rows: list[dict[str, str]], output_path: Path) -> None:
     workbook.save(output_path)
 
 
-def git_commit(repo: Path) -> str:
+def git_commit(repo: Optional[Path]) -> str:
+    if repo is None or not repo.is_dir():
+        return ""
     try:
         result = subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -194,8 +197,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--repo",
         type=Path,
-        default=Path("/path/to/paper-search-mcp"),
-        help="paper-search-mcp repository path",
+        default=(
+            Path(os.environ["PAPER_SEARCH_MCP_REPO"]).expanduser()
+            if os.environ.get("PAPER_SEARCH_MCP_REPO")
+            else None
+        ),
+        help="Optional paper-search-mcp repository path; defaults to PAPER_SEARCH_MCP_REPO",
     )
     parser.add_argument("--tsv-name", default="papers.tsv")
     parser.add_argument("--xlsx-name", default="papers.xlsx")
@@ -232,7 +239,7 @@ def main() -> int:
         "year_filter": args.year,
         "retrieved_at": retrieved_at,
         "command": args.command,
-        "paper_search_mcp_repo": str(args.repo),
+        "paper_search_mcp_repo": str(args.repo) if args.repo else "",
         "paper_search_mcp_commit": git_commit(args.repo),
         "python_version": platform.python_version(),
         "raw_input": str(args.input),

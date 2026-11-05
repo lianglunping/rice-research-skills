@@ -10,6 +10,8 @@ Best suited for:
 - mechanism-focused narrative reviews,
 - and topic briefs that will later be pasted into Word.
 
+When `style_profile = cns_empirical` is explicitly active, this module may instead support manuscript Introduction compression: retain only the problem, the decisive knowledge gap, the evidence-bearing prior context, and the study question. This is an optional manuscript route, not a change to default thesis review behavior.
+
 ## Default Process
 
 1. Lock the review question and scope boundary.
@@ -75,3 +77,10 @@ Return prose that includes:
 - and a closing sentence that points to the next subsection or study gap.
 
 If evidence is thin, say so explicitly instead of inflating the section.
+
+## CNS Introduction Compression (Optional Overlay)
+
+- Start from the biological or breeding problem rather than a broad field history.
+- Select prior studies for the inference they support, not to maximize citation count.
+- Move from established context to the unresolved causal or practical gap, then state the study's bounded aim.
+- Preserve thesis-style thematic depth, literature matrix, and subsection spine when `style_profile = default`.

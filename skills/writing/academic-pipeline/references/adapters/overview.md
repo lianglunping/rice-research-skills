@@ -3,8 +3,8 @@
 **Status**: Stable as of ARS v3.6.4
 **Applies to**: any adapter that produces a Material Passport `literature_corpus[]` field
 **Authoritative schemas**:
-- [`shared/contracts/passport/literature_corpus_entry.schema.json`](../../../shared/contracts/passport/literature_corpus_entry.schema.json)
-- [`shared/contracts/passport/rejection_log.schema.json`](../../../shared/contracts/passport/rejection_log.schema.json)
+- `shared/contracts/passport/literature_corpus_entry.schema.json` (external ARS component; see the dependency notes)
+- `shared/contracts/passport/rejection_log.schema.json` (external ARS component; see the dependency notes)
 
 ## 1. What an adapter is
 
@@ -13,7 +13,7 @@ An **adapter** is a program (in any language) that reads a user-owned corpus sou
 1. **`passport.yaml`** with a top-level `literature_corpus` array conforming to `literature_corpus_entry.schema.json`.
 2. **`rejection_log.yaml`** conforming to `rejection_log.schema.json`, always emitted (empty when no rejections).
 
-ARS provides three Python reference adapters in [`scripts/adapters/`](../../../scripts/adapters/). Users are expected to write their own adapters for non-reference sources. The three reference adapters are starting points, not production tools.
+ARS provides three Python reference adapters in `scripts/adapters/` (external ARS component; see the dependency notes). Users are expected to write their own adapters for non-reference sources. The three reference adapters are starting points, not production tools.
 
 ## 2. Why a contract, not a plugin API
 
@@ -25,7 +25,7 @@ ARS deliberately does NOT run adapter code itself. The adapter runs in the user'
 
 ## 3. Entry field reference
 
-Refer to the [`literature_corpus_entry` schema](../../../shared/contracts/passport/literature_corpus_entry.schema.json) for the authoritative contract. The field tables below are generated from that schema and must not drift.
+Refer to the `literature_corpus_entry` schema (external ARS component; see the dependency notes) for the authoritative contract. The field tables below are generated from that schema and must not drift.
 
 <!-- GENERATED:LITERATURE_CORPUS_REQUIRED:START -->
 | Field | Type | Description (first sentence) |
@@ -142,6 +142,11 @@ The three reference adapters have pytest coverage under `scripts/adapters/tests/
 
 ## 10. Relationship to other ARS artifacts
 
-- [`shared/handoff_schemas.md`](../../../shared/handoff_schemas.md) Schema 9: the `literature_corpus[]` field lives inside the Material Passport.
+- `shared/handoff_schemas.md` (external ARS component; see the dependency notes) Schema 9: the `literature_corpus[]` field lives inside the Material Passport.
 - [`academic-pipeline/references/passport_as_reset_boundary.md`](../passport_as_reset_boundary.md): `literature_corpus[]` is consumed across reset boundaries like any other passport field.
 - ARS agents that consume `literature_corpus[]` are **deferred** to v3.6.5+. As of v3.6.4, the field is a defined input port with no runtime consumer; adapters produce it, future ARS versions read it.
+
+This public snapshot does not bundle the external ARS schemas, adapters or design
+specifications named above. Confirm those contracts in the caller’s installation
+before enabling a feature that consumes them; report missing required components
+as a material gap. See the repository dependency notes.

@@ -1,8 +1,9 @@
 ---
 name: bio-variant-calling-joint-calling
-description: Joint genotype calling across multiple samples using GATK CombineGVCFs and GenotypeGVCFs. Essential for cohort studies, population genetics, and leveraging VQSR. Use when performing joint genotyping across multiple samples.
-tool_type: cli
-primary_tool: GATK
+description: "Variant calling joint calling: Joint genotype calling across multiple samples using GATK CombineGVCFs and GenotypeGVCFs."
+metadata:
+  tool_type: cli
+  primary_tool: GATK
 ---
 
 ## Version Compatibility
@@ -336,3 +337,12 @@ gatk GenomicsDBImport \
 - variant-calling/filtering-best-practices - VQSR and hard filtering
 - population-genetics/plink-basics - Population analysis of joint calls
 - workflows/fastq-to-variants - End-to-end germline pipeline
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

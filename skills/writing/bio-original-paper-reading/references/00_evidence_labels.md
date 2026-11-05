@@ -17,3 +17,4 @@ Hard rules:
 - Use `【图表解析受限】` when figure resolution, OCR, panel boundaries, axis labels, legends, or captions are unclear.
 - Use `【注意：原文信息存在疑似冲突】` when sections disagree on sample counts, parameters, materials, or conclusions.
 - For key claims, prefer "结论 - 依据 - 限定条件" rather than absolute wording.
+

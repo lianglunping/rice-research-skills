@@ -9,7 +9,7 @@
 | # | 检查项 | 来源 ID | 失败动作 |
 |---|--------|---------|----------|
 | 1 | `MANIFEST.md5` 覆盖所有 release 文件（除自身） | audit2-S1 | FIX_LOOP: 重新生成 |
-| 2 | 无内部路径残留: `grep -rn 'sxyH3\|/home/[a-z0-9]*/\|conda activate ngs'` = 0 | audit2-M5 | FIX_LOOP: sed 替换 + 警告 |
+| 2 | 无内部路径残留: `grep -rn 'REPLACE_HOST\|/home/[a-z0-9]*/\|conda activate ngs'` = 0 | audit2-M5 | FIX_LOOP: sed 替换 + 警告 |
 | 3 | README 关键数字可由 TSV 重算（Gprime q005 区间数, QTLseq ci95 区间数, 候选基因总数） | codex-1 盲点 #4 | FIX_LOOP: 重写 README |
 | 4 | Tier 分级声明与实际 `meanQval` 一致（A < 0.025 = N 个） | audit2-C1 | FIX_LOOP: 重写 Tier 段 |
 | 5 | Top QTL 基因数 = `uniq -c` 实测 unique 数 | audit2-C2 | FIX_LOOP: 重写 Top QTL 表 |

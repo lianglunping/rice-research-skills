@@ -28,3 +28,4 @@ Write in Chinese by default. Keep gene names, software names, file names, variab
    - Source coverage, missing inputs, unreliable notes, synthesis confidence.
 
 End with: "如需把某个 topic evidence matrix 展开成专题综述、把某个 research seed 转成实验/生信验证计划，或生成下一轮阅读队列，请回复对应主题、seed 编号或时间范围。"
+

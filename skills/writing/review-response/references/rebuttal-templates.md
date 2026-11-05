@@ -267,7 +267,7 @@ These changes have improved the manuscript's [质量方面], and we believe it n
 
 假设收到3位审稿人的意见：
 - Reviewer 1: 2个Major comments, 3个Minor comments
-- Reviewer 2: 1个Major comment, 2个Minor comments
+- Reviewer 2: 1个Major comment, 2个Minor comments  
 - Reviewer 3: 3个Minor comments
 
 ### 完整Rebuttal文档
@@ -287,7 +287,7 @@ We thank Reviewer 1 for the thorough review and insightful comments.
 
 **Comment 1.1**: The paper lacks comparison with recent state-of-the-art method X. This comparison is essential for evaluating the proposed method.
 
-**Response**: We thank the reviewer for this excellent suggestion. We have conducted additional experiments comparing our method with X on all three datasets. The results show that our method achieves comparable or better performance (Dataset A: +2.3%, Dataset B: +1.1%, Dataset C: -0.5%).
+**Response**: We thank the reviewer for this excellent suggestion. We have conducted additional experiments comparing our method with X on all three datasets. The results show that our method achieves comparable or better performance (Dataset A: +2.3%, Dataset B: +1.1%, Dataset C: -0.5%). 
 
 **Changes**: These new results have been added to Table 3 (page 7) and discussed in Section 4.3 (pages 7-8). We also provide detailed analysis of the performance differences.
 
@@ -477,3 +477,4 @@ We believe these revisions have significantly strengthened the manuscript and ad
 - 保持礼貌和专业的语气
 - 只承诺可行的改进
 - 回应所有意见，即使是小的typo
+

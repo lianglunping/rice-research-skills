@@ -40,3 +40,4 @@ Use:
 - time to minimum result.
 
 Prefer ideas that can be tested by a small first step.
+

@@ -1,8 +1,9 @@
 ---
 name: bio-reporting-figure-export
-description: Exports publication-ready figures in various formats with proper resolution, sizing, and typography. Use when preparing figures for journal submission, creating vector graphics for presentations, or ensuring consistent figure styling across analyses.
-tool_type: mixed
-primary_tool: matplotlib
+description: "Reporting figure export: Exports publication-ready figures in various formats with proper resolution, sizing, and typography."
+metadata:
+  tool_type: mixed
+  primary_tool: matplotlib
 ---
 
 ## Version Compatibility
@@ -105,3 +106,12 @@ fig.savefig('figure_multipanel.pdf', bbox_inches='tight')
 - data-visualization/ggplot2-fundamentals - Creating plots in R
 - data-visualization/heatmaps-clustering - Complex visualizations
 - data-visualization/multipanel-figures - Figure composition
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

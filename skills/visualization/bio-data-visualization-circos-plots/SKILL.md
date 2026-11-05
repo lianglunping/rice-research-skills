@@ -1,8 +1,9 @@
 ---
 name: bio-data-visualization-circos-plots
-description: Create circular genome visualizations with Circos and pyCircos. Display multi-track data including ideograms, genes, variants, CNVs, and interaction arcs. Use when creating circular genome visualizations.
-tool_type: mixed
-primary_tool: Circos
+description: "Data visualization circos plots: Create circular genome visualizations with Circos and pyCircos."
+metadata:
+  tool_type: mixed
+  primary_tool: Circos
 ---
 
 ## Version Compatibility
@@ -403,3 +404,12 @@ fig.savefig('genome_summary.png', dpi=300, bbox_inches='tight')
 - hi-c-analysis/hic-visualization - Hi-C-specific circos
 - copy-number/cnv-visualization - CNV visualization
 - variant-calling/structural-variant-calling - SV data for circos
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

@@ -34,3 +34,4 @@ WHERE paper_type = "original" AND figure_reading_status != "complete"
 ## Spaced Repetition
 
 If an Obsidian spaced repetition plugin is present, suggest flashcards or review markers. If not, rely on `review_next` fields and periodic notes.
+

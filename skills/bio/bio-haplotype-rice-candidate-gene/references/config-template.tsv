@@ -12,13 +12,54 @@ analysis_start	REPLACE_ANALYSIS_START
 analysis_end	REPLACE_ANALYSIS_END
 input_vcf	REPLACE_FULL_PATH/REPLACE_GENE_ID.vcf.gz
 input_gff	REPLACE_FULL_PATH/REPLACE_GENE_ID.gff3
-metadata_csv	/Volumes/Data/客户-生信/客户/辛威/LOC_Os11g16290/3K-info.csv
+metadata_csv	/path/to/project/metadata.csv
 sample_id_column	ID
 group_column	K5
 group_recode	Xian->XI;Geng->GJ
 exclude_rule	K5=na
+remote_host	REPLACE_HOST
+remote_conda_env	ngs
+remote_conda_activate	conda activate ngs
+remote_fd	fd
+remote_rg	rg
+remote_3k_vcf_dir	/path/to/reference-data/3K/3K/SNP
+remote_superrice_vcf_dir	/path/to/reference-data/superrice
+superrice_remote_snp_dir	/path/to/reference-data/superrice/1.rare_SNP
+superrice_remote_indel_dir	/path/to/reference-data/superrice/2.rare_InDel
+local_3k_metadata_xlsx	/path/to/metadata/population_groups.xlsx
+superrice_metadata_xlsx	/path/to/metadata/metadata_primary.xlsx;/path/to/metadata/metadata_secondary.xlsx
+dataset_selection_rule	max_trait_overlap
+dataset_mode	3k
+site_bad_rate_threshold	0.03
+site_bad_rate_threshold_note	3K default; for superrice replace only after a recorded threshold sensitivity audit.
+site_bad_rate_threshold_selection	3k_validated_default_or_REPLACE_WITH_SUPERRICE_SENSITIVITY_RULE
+domestication_network_enabled	true
+domestication_network_flank_bp	0
+common_haplotype_frequency_min	0.005
+phasing_mode	auto
+wild_group_regex	^Or|Or-|rufipogon|nivara
+cultivar_group_regex	^XI|^GJ|^cA|^cB
+metadata_geography_mode	lat_lon_or_Original_Area
+formal_mode	standard_or_superrice_reference_compatible_v2
+grouping_mode	domestication_binary_or_reference_subgroup
+display_haplotype_max	80
+display_focus_site_max	50
+popgen_groups	XI,GJ,Or
+popgen_excluded_groups	Undefined
+popgen_variant_types	SNP
+popgen_max_missing	REPLACE_PROJECT_THRESHOLD
+popgen_maf_filter	none_or_REPLACE_WITH_JUSTIFICATION
+popgen_callable_mask	REPLACE_AVAILABLE_OR_UNAVAILABLE
+popgen_window_bp	REPLACE_WINDOW
+popgen_step_bp	REPLACE_STEP
+popgen_all_start	REPLACE_WIDE_START
+popgen_all_end	REPLACE_WIDE_END
+popgen_filter_start	REPLACE_FILTER_START
+popgen_filter_end	REPLACE_FILTER_END
 vcf_filter_missing	< 5%
 vcf_filter_maf	>= 0.05
 major_haplotype_threshold	n >= 30
 reference_assembly	MSU_osa1r7
 run_date	REPLACE_YYYYMMDD
+target_figure_pair_min	REPLACE_EXPECTED_FIGURE_PAIRS
+delivery_exclude_extensions	.R,.sh,.py,.log,.tsv,.png

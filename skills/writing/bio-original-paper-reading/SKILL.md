@@ -1,6 +1,6 @@
 ---
 name: bio-original-paper-reading
-description: Deep-reading workflow for original empirical biology papers, especially molecular biology, genomics, omics, quantitative genetics, plant breeding, rice, and mutagenesis studies. Use when the user provides a PDF, DOI, Zotero item/citekey, title, or folder and asks to interpret an original research article, reconstruct the paper from Main Figures, audit figure panels, inspect x/y axes, explain wet-lab images, read Discussion critically, judge evidence strength, extract breeding or bioinformatics lessons, or prepare dry-run Zotero/Obsidian notes. Do not use for general literature search, paper download, Zotero setup, BibTeX export, citation insertion, or raw data analysis unless the request explicitly asks for deep reading of a specific original paper.
+description: "Original paper reading: Deep-reading workflow for original empirical biology papers, especially molecular biology, genomics, omics, quantitative genetics, plant breeding, rice, and mutagenesis studies."
 ---
 
 # Bio Original Paper Reading
@@ -13,8 +13,16 @@ Use this skill for single-paper deep reading of original empirical research arti
 - Do not use for Review, Perspective, Opinion, Roadmap, News & Views, or Protocol collection papers; switch to `bio-review-paper-reading`.
 - Do not use for literature retrieval, paper download, citation management, Zotero configuration, or BibTeX export; use a search/Zotero workflow instead.
 - Do not perform raw data reanalysis, variant calling, RNA-seq analysis, or pipeline implementation unless the user separately asks for that task.
-- Do not write to Zotero or Obsidian by default. Produce dry-run write plans unless the user explicitly confirms a write action.
+- Zotero/Obsidian writes require applicable task authorization; default to dry-run plans otherwise. Reuse an existing explicit scoped write instruction without asking for the same approval again.
 - Treat PDF-to-Markdown text as navigation evidence only. Critical claims must be checked against the original PDF, figure, table, method, supplement, or clearly identified external source.
+
+## Note-vault integration
+
+When this task uses a configured note vault, read the guidance in
+[the Obsidian output contract](references/07_zotero_obsidian_output.md). Use the actual compatible
+local model, including `gpt-6.1-sol` or `gpt-5.6-sol`; no model service, plugin
+installation or new agent is needed merely to write Markdown. Keep note output
+proportionate, reuse existing folders and preserve the scientific evidence rules.
 
 ## Default Workflow
 
@@ -65,4 +73,9 @@ Before finalizing, verify:
 - Statistical significance is not treated as biological relevance by default.
 - Association is not described as causality unless direct causal evidence is present.
 - External findings are labeled `[外部检索补充]` and never overwrite original-paper facts.
-- Zotero/Obsidian output remains dry-run unless explicit user confirmation exists.
+- Zotero/Obsidian output remains dry-run unless applicable task write authorization exists.
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

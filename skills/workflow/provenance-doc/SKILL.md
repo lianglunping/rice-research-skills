@@ -1,8 +1,13 @@
 ---
 name: provenance-doc
-description: >
-  This skill should be used when the user asks to "记一下这个分析"、"生成 provenance"、"生成溯源文档"、"帮我创建复现文档"、"封版"、"seal version"、"create provenance for this analysis"、"归档当前结果"、"为 v1.3.2 写溯源文档"、"provenance for analysis/foo"、or needs to bind claims/artifacts/verification commands/version lineage for reproducibility. Auto-aggregates from sibling `run_config.yaml` / `*.meta.yaml`. Two templates (full + lite) with state machine `draft → numbers-pending → verification-ready → verified → sealed`.
-allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
+description: "Analysis provenance and release documentation: record inputs, paths, versions, parameters, commands, evidence and frozen output boundaries."
+allowed-tools:
+- Read
+- Write
+- Edit
+- Bash
+- Glob
+- Grep
 ---
 
 # Provenance Doc Skill

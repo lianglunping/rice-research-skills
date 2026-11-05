@@ -8,7 +8,7 @@ CONFIG = {
     "xlsx_path": "M1需要验证的InDel（含引物及扩增长度）.xlsx",  # 主变异信息 xlsx
     "ref_genome": "/path/to/reference.fa",                       # samtools faidx 已建索引
     "tracy_bin": str(Path.home() / "tracy_v0.8.9_macos_arm64"),  # ~/tracy_v0.8.9_macos_arm64
-
+    
     # ---- 批次目录（按顺序追加）----
     "batches": [
         ("batch1",        "一代测序第一次验证/报告成功"),

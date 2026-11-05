@@ -38,3 +38,4 @@ requires_confirmation: true
 - Keep original review claims, external updates, and expert judgments in distinct sections.
 - Backtracking queue previews should be separate from the main note preview.
 - If external update evidence is still incomplete, mark the patch as provisional rather than complete.
+

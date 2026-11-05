@@ -5,13 +5,13 @@
 当 Git 无法自动合并时，会标记冲突：
 
 ```
-\<\<\<\<\<\<\< HEAD
+<<<<<<< HEAD
 // 当前分支的代码
 const name = '张三'
-\=\=\=\=\=\=\=
+=======
 // 要合并的分支的代码
 const name = '李四'
-\>\>\>\>\>\>\> feature/user-management
+>>>>>>> feature/user-management
 ```
 
 ## 解决冲突步骤

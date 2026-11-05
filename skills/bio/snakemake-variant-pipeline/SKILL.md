@@ -1,6 +1,6 @@
 ---
 name: snakemake-variant-pipeline
-description: This skill should be used when the user asks to scaffold a modular Snakemake workflow for resequencing projects, including FASTQ QC, BAM generation, GATK-first SNP/indel calling, or Manta/Delly SV calling, or explicitly wants a bcftools-based branch.
+description: "Modular Snakemake resequencing workflows for read QC, alignment, GATK SNP/InDel calling and Manta/Delly SV analysis with explicit data and reference contracts."
 ---
 
 # Modular Snakemake Workflow Library
@@ -34,6 +34,7 @@ Do not assume the user wants the full pipeline. First identify the final deliver
 - install tools or create conda envs unless the user explicitly asks
 - force a full variant workflow when the user only needs QC or BAM
 - auto-drop low-mapping samples by default; the default behavior is to mark them
+- choose a universal SV caller ensemble or merge threshold; first use `bio-variant-calling-structural-variant-calling` to fix the caller portfolio, representation policy, ensemble views, and benchmark contract
 
 ## Delivery Modes
 
@@ -42,7 +43,7 @@ Do not assume the user wants the full pipeline. First identify the final deliver
 | QC-only | `qc.smk` |
 | BAM-only | `qc.smk`, `align.smk`, optional `markdup.smk`, `bamstat.smk`, `alignment_qc.smk` |
 | GATK default | `qc.smk`, `align.smk`, `markdup.smk`, `alignment_qc.smk`, `gatk_gvcf.smk`, `gatk_joint.smk`, `gatk_filter.smk` |
-| SV-only | `alignment_qc.smk`, `sv_calling.smk`, `sv_merge.smk` |
+| SV-only | `alignment_qc.smk`, `sv_calling.smk`, `sv_merge.smk` after the SV ensemble contract is fixed |
 | bcftools explicit-only | `alignment_qc.smk`, `bcftools_call.smk` |
 
 ## Default Workflow
@@ -118,5 +119,5 @@ Load only what is needed:
 - `references/snakefile-template.md` - module templates, config schema, and `main.smk` combinations
 - `references/mapping-qc-gating.md` - mapping-rate thresholds, mark vs drop policy, checkpoint pattern
 - `references/gpu-joint-calling.md` - GATK cohort joint calling acceleration options
-- `examples/config-rice-131.yaml` - rice resequencing example with GATK default and mapping-QC config
+- `examples/config-rice-example.yaml` - rice resequencing example with GATK default and mapping-QC config
 - `scripts/evaluate_mapping_qc.py` - deterministic parser for Picard/samtools mapping metrics and sample gating

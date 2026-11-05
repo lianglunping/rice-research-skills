@@ -79,12 +79,12 @@ class DatabaseConnection:
     def __init__(self, connection_string: str):
         self.connection_string = connection_string
         self.connection = None
-
+    
     def __enter__(self):
         logger.info(f"连接数据库: {self.connection_string}")
         self.connection = f"Connection to {self.connection_string}"
         return self.connection
-
+    
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
             logger.error(f"发生异常: {exc_val}")
@@ -106,14 +106,14 @@ def validate_and_process(data: Dict[str, Any]) -> Any:
         # 验证数据
         if 'value' not in data:
             raise ValueError("数据中缺少 'value' 字段")
-
+        
         value = data['value']
         if not isinstance(value, (int, float)):
             raise TypeError(f"value 应该是数字，实际类型: {type(value)}")
-
+        
         # 处理数据
         return value * 2
-
+        
     except (ValueError, TypeError) as e:
         # 保留原始异常并添加上下文
         raise RuntimeError(f"数据处理失败: {data}") from e
@@ -131,26 +131,26 @@ class Result:
         self.success = success
         self.value = value
         self.error = error
-
+    
     @classmethod
     def ok(cls, value: Any) -> 'Result':
         return cls(success=True, value=value)
-
+    
     @classmethod
     def err(cls, error: str) -> 'Result':
         return cls(success=False, error=error)
-
+    
     def is_ok(self) -> bool:
         return self.success
-
+    
     def is_err(self) -> bool:
         return not self.success
-
+    
     def unwrap(self) -> Any:
         if not self.success:
             raise ValueError(f"尝试解包错误结果: {self.error}")
         return self.value
-
+    
     def unwrap_or(self, default: Any) -> Any:
         return self.value if self.success else default
 
@@ -161,7 +161,7 @@ def safe_divide_result(a: float, b: float) -> Result:
     """
     if b == 0:
         return Result.err(f"除数不能为零: {b}")
-
+    
     try:
         return Result.ok(a / b)
     except Exception as e:
@@ -184,24 +184,24 @@ def validate_user(data: Dict[str, Any]) -> None:
     收集所有验证错误而不是遇到第一个就停止
     """
     errors = []
-
+    
     if 'name' not in data:
         errors.append("缺少 'name' 字段")
     elif not isinstance(data['name'], str):
         errors.append("'name' 应该是字符串")
     elif len(data['name']) < 2:
         errors.append("'name' 长度应该至少为 2")
-
+    
     if 'age' not in data:
         errors.append("缺少 'age' 字段")
     elif not isinstance(data['age'], int):
         errors.append("'age' 应该是整数")
     elif data['age'] < 0 or data['age'] > 150:
         errors.append("'age' 应该在 0-150 之间")
-
+    
     if 'email' in data and '@' not in data['email']:
         errors.append("'email' 格式不正确")
-
+    
     if errors:
         raise ValidationError(errors)
 
@@ -224,7 +224,7 @@ def get_config(config: Dict[str, Any], key: str, default: Any = None) -> Any:
             else:
                 return default
         return value
-
+    
     # 简单键
     return config.get(key, default)
 
@@ -242,13 +242,13 @@ def get_user_preferences(user_id: int) -> Dict[str, Any]:
         return _get_from_cache(user_id)
     except Exception as e:
         logger.warning(f"从缓存获取失败: {e}")
-
+    
     # 尝试 2：从数据库获取
     try:
         return _get_from_database(user_id)
     except Exception as e:
         logger.warning(f"从数据库获取失败: {e}")
-
+    
     # 尝试 3：使用默认配置
     logger.info("使用默认配置")
     return _get_default_preferences()
@@ -278,24 +278,24 @@ def _get_default_preferences() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-
+    
     print("=" * 50)
     print("错误处理模式示例")
     print("=" * 50)
-
+    
     # 测试结果对象模式
     print("\n1. 结果对象模式:")
     result1 = safe_divide_result(10, 2)
     print(f"10 / 2 = {result1.unwrap()}")
-
+    
     result2 = safe_divide_result(10, 0)
     print(f"10 / 0 = {result2.unwrap_or('N/A')} ({result2.error})")
-
+    
     # 测试优雅降级
     print("\n2. 优雅降级:")
     prefs = get_user_preferences(123)
     print(f"用户偏好: {prefs}")
-
+    
     # 测试上下文管理器
     print("\n3. 上下文管理器:")
     try:

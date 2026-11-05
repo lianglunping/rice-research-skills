@@ -171,6 +171,6 @@ QTLseqr `plotQTLStats(plotThreshold=TRUE, q=0.01)` **仅在至少一个 window m
 | 违规 | grep 命令 |
 |------|-----------|
 | 内部服务器路径 | `grep -rn '/home/[a-z0-9]*/' release/` |
-| SSH 别名 | `grep -rn 'sxyH3\|[a-z]*H[0-9]:' release/` |
+| SSH 别名 | `grep -rn 'REPLACE_HOST\|[a-z]*H[0-9]:' release/` |
 | hardcoded conda env | `grep -rn 'conda activate ngs' release/` |
 | emoji ✅ 于结果文档（误导性） | `grep -rn '✅' release/0[0-9]_*.md` |

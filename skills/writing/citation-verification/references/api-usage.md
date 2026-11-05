@@ -370,3 +370,4 @@ class APICache:
 1. **CrossRef (DOI)** - 最可靠
 2. **arXiv (arXiv ID)** - 可靠
 3. **Semantic Scholar (标题搜索)** - 较可靠,需要人工确认
+

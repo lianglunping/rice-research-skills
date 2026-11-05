@@ -9,6 +9,18 @@ Choose exactly one primary module per request.
 | `deai` | User wants academic polishing, naturalization, reduced AI traces, or voice cleanup | `.docx`, `.md`, paragraph draft, chapter draft | revised prose, issue list, patch pack | `deai-bio-zh-en.md` |
 | `docx_bridge` | User wants Word extraction, section export, Markdown to Word rendering, or section patching | `.docx`, `.md`, section text | extracted Markdown/JSON, rendered `.docx`, patch pack | `docx-markdown-bridge.md` |
 
+## Optional Style Overlay
+
+Set the request contract as follows:
+
+```text
+primary_module = literature_review | results_to_prose | deai | docx_bridge
+style_profile = default | cns_empirical
+journal_target = unspecified | Cell | Nature | Science
+```
+
+Exactly one `primary_module` is required. `style_profile` is an optional overlay, not a second module; use at most one overlay. Activate `cns_empirical` only when the user explicitly requests CNS/high-impact-journal style or explicitly names `Cell`, `Nature`, or `Science`. An unspecified target uses cross-journal common principles. Ordinary thesis or Word work keeps `style_profile = default` and must not be automatically compressed into CNS style. When active, read `cns-empirical-writing.md` in addition to the selected primary module.
+
 ## Input Priority
 
 Prefer inputs in this order:

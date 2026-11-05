@@ -1,7 +1,12 @@
 ---
 name: bio-sanger-tracy-validation
-description: This skill should be used when the user asks to "分析一代测序结果", "Sanger测序验证", "解读ab1文件", "tracy decompose", "更新验证报告", "新增一批测序结果", or needs to validate genomic variants using Sanger sequencing ab1 files. Handles pipeline setup for new projects and batch updates for ongoing validation campaigns.
-tags: [Bioinformatics, Sanger, Tracy, Validation]
+description: "Sanger trace validation with Tracy and explicit reference, strand, primer, allele and chromatogram evidence."
+metadata:
+  tags:
+  - Bioinformatics
+  - Sanger
+  - Tracy
+  - Validation
 ---
 
 # Bio Sanger Tracy Validation
@@ -81,3 +86,8 @@ for batch_tag in ["batch1_cancel", ..., "batchN_cancel"]:
 - `references/pipeline_template.py` — 完整泛化 pipeline（新项目直接复制使用）
 - `references/config_guide.md` — CONFIG 字典填写说明及输入 xlsx 列定义
 - `references/ab1_naming_convention.md` — ab1 文件命名规则与方向解析逻辑
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Short-read SV Calling"
+  short_description: "Install, run, merge, and benchmark short-read SV callers"
+  default_prompt: "Use $bio-variant-calling-structural-variant-calling to install or audit the required tools, run short-read germline SV callers, and build a reproducible ensemble for my cohort."

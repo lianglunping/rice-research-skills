@@ -1,8 +1,9 @@
 ---
 name: bio-variant-annotation
-description: Comprehensive variant annotation using bcftools annotate/csq, VEP, SnpEff, and ANNOVAR. Add database annotations, predict functional consequences, and assess clinical significance. Use when annotating variants with functional and clinical information.
-tool_type: mixed
-primary_tool: VEP
+description: "Variant annotation: Comprehensive variant annotation using bcftools annotate/csq, VEP, SnpEff, and ANNOVAR."
+metadata:
+  tool_type: mixed
+  primary_tool: VEP
 ---
 
 ## Version Compatibility
@@ -413,3 +414,17 @@ bcftools view -i 'INFO/CSQ~"HIGH" || INFO/CSQ~"MODERATE"' \
 - variant-calling/filtering-best-practices - Filter by annotations
 - variant-calling/vcf-basics - Query annotated fields
 - database-access/entrez-fetch - Download annotation databases
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

@@ -82,19 +82,19 @@ mapping_qc:
 
 ## Official References
 
-- GATK: AlignmentSummaryMetrics
+- GATK: AlignmentSummaryMetrics  
   https://gatk.broadinstitute.org/hc/en-us/articles/27007980736155-AlignmentSummaryMetrics
-- GATK: CollectAlignmentSummaryMetrics (Picard)
+- GATK: CollectAlignmentSummaryMetrics (Picard)  
   https://gatk.broadinstitute.org/hc/en-us/articles/360045799412-CollectAlignmentSummaryMetrics-Picard
-- samtools flagstat
+- samtools flagstat  
   https://www.htslib.org/doc/samtools-flagstat.html
-- MultiQC customisation
+- MultiQC customisation  
   https://docs.seqera.io/multiqc/reports/customisation/
-- MultiQC samtools module
+- MultiQC samtools module  
   https://docs.seqera.io/multiqc/modules/samtools/
-- MultiQC picard module
+- MultiQC picard module  
   https://docs.seqera.io/multiqc/modules/picard
-- Snakemake checkpoints
+- Snakemake checkpoints  
   https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html
-- Illumina minimal checklist for human WGS context
+- Illumina minimal checklist for human WGS context  
   https://help.connected.illumina.com/dragen/product-guides/dragen-v4.5/qc-metrics-reporting/minimal_checklist

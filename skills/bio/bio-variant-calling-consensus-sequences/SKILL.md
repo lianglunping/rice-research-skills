@@ -1,8 +1,9 @@
 ---
 name: bio-consensus-sequences
-description: Generate consensus FASTA sequences by applying VCF variants to a reference using bcftools consensus. Use when creating sample-specific reference sequences or reconstructing haplotypes.
-tool_type: cli
-primary_tool: bcftools
+description: "Consensus sequences: Generate consensus FASTA sequences by applying VCF variants to a reference using bcftools consensus."
+metadata:
+  tool_type: cli
+  primary_tool: bcftools
 ---
 
 ## Version Compatibility
@@ -338,3 +339,12 @@ Note: Use `bcftools consensus` for production - handles indels and edge cases pr
 - filtering-best-practices - Filter variants before consensus
 - variant-normalization - Normalize indels first
 - alignment-files/reference-operations - Reference manipulation
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

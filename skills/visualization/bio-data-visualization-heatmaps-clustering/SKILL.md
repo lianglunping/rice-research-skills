@@ -1,8 +1,9 @@
 ---
 name: bio-data-visualization-heatmaps-clustering
-description: Create clustered heatmaps with row/column annotations using ComplexHeatmap, pheatmap, and seaborn for gene expression and omics data visualization. Use when visualizing expression patterns across samples or identifying co-expressed gene clusters.
-tool_type: mixed
-primary_tool: ComplexHeatmap
+description: "Data visualization heatmaps clustering: Create clustered heatmaps with row/column annotations using ComplexHeatmap, pheatmap, and seaborn for gene expression and omics data visualization."
+metadata:
+  tool_type: mixed
+  primary_tool: ComplexHeatmap
 ---
 
 ## Version Compatibility
@@ -224,3 +225,12 @@ dev.off()
 - data-visualization/ggplot2-fundamentals - General plotting
 - data-visualization/color-palettes - Color selection
 - differential-expression/de-visualization - Expression heatmaps
+
+## bioSkills Upstream References
+
+Local `SKILL.md` remains the canonical trigger and workflow for this Codex setup. Expanded upstream material from `GPTomics/bioSkills` commit `2fe089dfa64990d79afac39b58a16f074c29e23a` is available at:
+
+- `references/bioSkills-upstream-usage-guide.md` for the converted upstream usage guide.
+- `scripts/bioSkills-upstream/` for converted upstream example scripts, when examples exist.
+
+Use the upstream files as supporting references only after reading this local skill first.

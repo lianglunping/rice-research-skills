@@ -7,9 +7,7 @@ import tempfile
 import textwrap
 from pathlib import Path
 
-SCRIPT = Path(
-    str(Path.home()) + "/.codex/skills/provenance-doc/scripts/status_check.py"
-)
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/status_check.py"
 
 
 def run(doc_text: str, *args: str) -> tuple[int, str]:
@@ -17,7 +15,7 @@ def run(doc_text: str, *args: str) -> tuple[int, str]:
         f.write(doc_text)
         fp = f.name
     r = subprocess.run(
-        ["uv", "run", str(SCRIPT), fp, *args],
+        [sys.executable, str(SCRIPT), fp, *args],
         capture_output=True,
         text=True,
     )

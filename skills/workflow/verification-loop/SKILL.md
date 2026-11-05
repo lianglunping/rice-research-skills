@@ -1,7 +1,8 @@
 ---
 name: verification-loop
-description: This skill should be used when the user asks to "verify code", "run verification", "check quality", "validate changes", or before creating a PR. Provides comprehensive verification including build, type check, lint, tests, security scan, and diff review.
-version: 1.0.0
+description: "Change verification using the relevant build, type, lint, test and artifact checks. Choose gates from actual project requirements and changed behavior."
+metadata:
+  version: 1.0.0
 ---
 
 # Verification Loop Skill

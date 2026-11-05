@@ -41,7 +41,7 @@ conda:
   sv_merge: sv_consensus
   bcftools: ngs
 
-conda_init: "source /path/to/remote-home/miniconda3/etc/profile.d/conda.sh"
+conda_init: "source /path/to/conda/etc/profile.d/conda.sh"
 
 resources:
   qc:

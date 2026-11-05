@@ -45,3 +45,4 @@ Always include lessons for the user's future work:
 - Which statistical shortcut could mislead reviewers?
 - Which validation step is essential before claiming breeding value?
 - Which author narrative technique made weak evidence look stronger?
+

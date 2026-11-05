@@ -5,13 +5,16 @@ import argparse
 from pathlib import Path
 
 from sar_utils import (
-    CLEANUP_CANDIDATE_HEADER, COMMAND_HEADER, DISK_USAGE_HEADER, ENV_HEADER,
-    FILES_HEADER, HOST_HEADER, INSTALL_HEADER, JOB_HEADER, MONITOR_HEADER,
+    AGENT_ASSIGNMENT_HEADER, AUDIT_RECEIPT_HEADER, CLEANUP_CANDIDATE_HEADER,
+    COMMAND_HEADER, DISK_USAGE_HEADER, ENV_HEADER, FILES_HEADER, HOST_HEADER,
+    INSTALL_HEADER, INTEGRATION_EVENT_HEADER, JOB_HEADER, MONITOR_HEADER,
     PATH_HEADER, PATH_MAP_HEADER, QC_HEADER, REFERENCE_HEADER,
     REMOTE_COMMAND_HEADER, REMOTE_JOB_HEADER, SOFTWARE_HEADER, STAGE_HEADER,
     STORAGE_POLICY_HEADER, SYNC_HEADER, TODO_HEADER, TODO_HISTORY_HEADER,
-    has_substantive_content, nonempty_text, read_simple_yaml, read_tsv, validate_tsv_header,
+    has_substantive_content, nonempty_text, read_simple_yaml, read_tsv,
+    validate_tsv_header, validate_assignment_model,
 )
+from audit_receipt import receipt_issues
 
 
 BASE_REQUIRED = [
@@ -26,7 +29,9 @@ BASE_REQUIRED = [
     "metadata/reference_registry.tsv", "metadata/storage_policy.tsv",
     "logs/remote_commands.tsv", "logs/remote_jobs.tsv", "logs/sync.tsv",
     "logs/install.tsv", "logs/disk_usage.tsv", "logs/cleanup_candidates.tsv",
-    "monitoring/remote_monitor_plan.md",
+    "monitoring/remote_monitor_plan.md", "metadata/coordination.yaml",
+    "coordination/agent_assignments.tsv", "coordination/integration_events.tsv",
+    "coordination/audit_receipts.tsv",
 ]
 FINAL_REQUIRED = [
     "03_execution/final/final_report.md", "03_execution/final/provenance.md",
@@ -70,6 +75,9 @@ def main() -> int:
         ("logs/install.tsv", INSTALL_HEADER),
         ("logs/disk_usage.tsv", DISK_USAGE_HEADER),
         ("logs/cleanup_candidates.tsv", CLEANUP_CANDIDATE_HEADER),
+        ("coordination/agent_assignments.tsv", AGENT_ASSIGNMENT_HEADER),
+        ("coordination/integration_events.tsv", INTEGRATION_EVENT_HEADER),
+        ("coordination/audit_receipts.tsv", AUDIT_RECEIPT_HEADER),
     ]
     for rel, header in header_checks:
         issues.extend(validate_tsv_header(run_dir / rel, header))
@@ -208,6 +216,72 @@ def main() -> int:
                 issues.append(f"cleanup_missing_required_field\t{candidate_id}\t{field}")
         if row.get("storage_class", "") in never_delete_classes and row.get("status", "") != "Rejected":
             issues.append(f"cleanup_forbidden_never_delete_class\t{candidate_id}\t{row.get('storage_class', '')}")
+
+    assignments = read_tsv(run_dir / "coordination/agent_assignments.tsv")
+    coordination_state = read_simple_yaml(run_dir / "metadata/coordination.yaml")
+    for field in ["coordination_epoch", "canonical_revision", "sealed_revision", "sealed_scope_fingerprint", "last_manifest_sha256"]:
+        if field not in coordination_state:
+            issues.append(f"coordination_missing_required_field\t{field}")
+    active_assignments = [row for row in assignments if row.get("status") in {"Planned", "Running"}]
+    active_integrators = [row for row in active_assignments if row.get("role") == "CANONICAL_INTEGRATOR"]
+    if len(active_integrators) > 1:
+        issues.append("coordination_multiple_active_integrators")
+    active_writers = [row for row in active_assignments if row.get("role") in {"STAGING_WRITER", "CANONICAL_INTEGRATOR"}]
+    if len(active_writers) > 1:
+        issues.append("coordination_multiple_active_writers")
+    for row in assignments:
+        assignment_id = row.get("assignment_id", "")
+        for field in ["assignment_id", "agent_path", "role", "base_revision", "status"]:
+            if not row.get(field, ""):
+                issues.append(f"assignment_missing_required_field\t{assignment_id}\t{field}")
+        if row.get("role") not in {"READ_ONLY_REVIEWER", "STAGING_WRITER", "CANONICAL_INTEGRATOR", "AUDITOR"}:
+            issues.append(f"assignment_invalid_role\t{assignment_id}\t{row.get('role', '')}")
+        if not validate_assignment_model(row):
+            issues.append(f"assignment_invalid_model_role\t{assignment_id}")
+        if row.get("role") in {"READ_ONLY_REVIEWER", "AUDITOR"} and row.get("write_scope", ""):
+            issues.append(f"assignment_read_only_has_write_scope\t{assignment_id}")
+        if row.get("role") == "CANONICAL_INTEGRATOR":
+            if row.get("agent_path") not in {"root", "/root"}:
+                issues.append(f"assignment_nonroot_integrator\t{assignment_id}")
+        if row.get("role") == "STAGING_WRITER":
+            owned_root = (run_dir / "coordination/staging" / assignment_id).resolve()
+            for raw_scope in row.get("write_scope", "").split("|"):
+                if not raw_scope:
+                    continue
+                scope = Path(raw_scope).expanduser().resolve()
+                if scope != owned_root and owned_root not in scope.parents:
+                    issues.append(f"assignment_staging_scope_escape\t{assignment_id}\t{scope}")
+        if row.get("status") in {"Planned", "Running"} and row.get("base_revision") != coordination_state.get("canonical_revision"):
+            issues.append(f"active_assignment_stale_base\t{assignment_id}")
+
+    receipts = read_tsv(run_dir / "coordination/audit_receipts.tsv")
+    for row in receipts:
+        receipt_id = row.get("receipt_id", "")
+        for field in ["receipt_id", "audit_type", "revision_id", "manifest_sha256", "scope_fingerprint", "audit_cutoff", "auditor", "verdict", "valid_status"]:
+            if not row.get(field, ""):
+                issues.append(f"audit_receipt_missing_required_field\t{receipt_id}\t{field}")
+        if row.get("valid_status") == "Valid":
+            for field in ["auditor_assignment_id", "audit_report_path", "audit_report_sha256", "findings_path", "findings_sha256"]:
+                if not row.get(field, ""):
+                    issues.append(f"audit_receipt_missing_binding\t{receipt_id}\t{field}")
+            revision_id = row.get("revision_id", "")
+            seal_path = run_dir / "coordination/revisions" / revision_id / "seal.yaml"
+            if not seal_path.exists():
+                issues.append(f"audit_receipt_unsealed_revision\t{receipt_id}\t{revision_id}")
+            else:
+                seal = read_simple_yaml(seal_path)
+                if seal.get("manifest_sha256") != row.get("manifest_sha256"):
+                    issues.append(f"audit_receipt_manifest_binding_mismatch\t{receipt_id}")
+            if revision_id != coordination_state.get("canonical_revision") or revision_id != coordination_state.get("sealed_revision"):
+                issues.append(f"audit_receipt_not_current_revision\t{receipt_id}\t{revision_id}")
+            if row.get("manifest_sha256") != coordination_state.get("last_manifest_sha256"):
+                issues.append(f"audit_receipt_not_current_manifest\t{receipt_id}")
+            if row.get("scope_fingerprint") != coordination_state.get("sealed_scope_fingerprint"):
+                issues.append(f"audit_receipt_not_current_scope\t{receipt_id}")
+            # This is intentionally read-only: stale receipts must fail the
+            # manifest check without changing the receipt registry.
+            for receipt_issue in receipt_issues(run_dir, row):
+                issues.append(f"audit_receipt_live_revalidation_failed\t{receipt_id}\t{receipt_issue}")
 
     remote_jobs = read_tsv(run_dir / "logs/remote_jobs.tsv")
     for row in remote_jobs:

@@ -1,7 +1,8 @@
 ---
 name: git-workflow
-description: This skill should be used when the user asks to "create git commit", "manage branches", "follow git workflow", "use Conventional Commits", "handle merge conflicts", or asks about git branching strategies, version control best practices, pull request workflows. Provides comprehensive Git workflow guidance for team collaboration.
-version: 1.2.0
+description: "Git commits, branches, merge conflicts and repository history conventions. Apply only the Git operations included in the task scope."
+metadata:
+  version: 1.2.0
 ---
 
 # Git Workflow Standards
@@ -194,13 +195,13 @@ For detailed merge strategies and techniques, see `references/merge-strategies.m
 ### Identifying Conflicts
 
 ```
-\<\<\<\<\<\<\< HEAD
+<<<<<<< HEAD
 // Current branch code
 const name = 'Alice'
-\=\=\=\=\=\=\=
+=======
 // Branch being merged
 const name = 'Bob'
-\>\>\>\>\>\>\> feature/user-management
+>>>>>>> feature/user-management
 ```
 
 ### Resolving Conflicts

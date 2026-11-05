@@ -2,10 +2,18 @@
 
 Zotero and Obsidian are first-class targets, but writes are not default.
 
+## Caller-configured note target
+
+Use only the vault path and folder conventions supplied or verified for the
+current task. Inspect existing folders before selecting note locations and
+reuse applicable scoped write authorization. This reference does not activate
+daily logging. Keep the current compatible model; note output alone needs no
+new model service, plugin or agent.
+
 ## Write Safety
 
 - Default mode is `dry_run`.
-- Do not delete, overwrite, move, retag, or rename Zotero or Obsidian content without explicit user confirmation.
+- Do not delete, overwrite, move, retag, or rename Zotero or Obsidian content without applicable explicit user authorization.
 - If the target note exists, prepare a preview patch or conflict report.
 - If citekey, DOI, title, or Zotero item key conflict, stop write planning.
 

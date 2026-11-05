@@ -1,78 +1,95 @@
 ---
 name: job-monitor-loop
-description: This skill should be used when the user asks to monitor a long-running job, loop on task status, watch logs, check a background task, create Claude-like loop behavior, detect job anomalies, monitor tmux/wrapper.sh jobs with RUN_ID or RUN_DIR, use submit-monitor style supervision, or handle failures during bioinformatics pipelines and other long-running analyses.
+description: "Automatic supervision of authorized long-running jobs: background submission, progress-aware backoff, bounded repair and artifact acceptance. Preserve task and host boundaries."
 ---
 
 # Job Monitor Loop
 
-Use this skill to monitor long-running tasks with staged backoff, reproducible evidence, and bounded anomaly handling.
+Use when executing or supervising an authorized long-running task. Background
+submission includes actual monitoring; no separate invocation is needed. A policy
+discussion or skill edit alone does not identify a live job to monitor.
 
-## Goal
+## Start or resume
 
-Provide a Claude `/loop`-like workflow for Codex sessions and automations:
-- submit or attach to a background task,
-- check status, logs, and outputs on a staged schedule,
-- detect early crashes or obvious anomalies,
-- report evidence and next actions without destructive changes.
+- Record target host, work directory, command/environment, input/output/log paths,
+  logical RUN_ID, attempt and actual job/process ID. Define completion gates and
+  applicable resource and recovery limits before submission. New preauthorized
+  tasks under the user's renewable recovery instruction explicitly record
+  RENEWABLE mode, scope fingerprint and renewal authority. Honor fixed user caps;
+  missing mode on existing state retains FIXED semantics. See
+  [repair-policy.md](references/repair-policy.md).
+- Select OBSERVE_ONLY, REPAIR_PREAUTHORIZED or DECISION_REQUIRED. For a newly
+  authorized long task, the user's standing instruction to fix errors and resubmit
+  supplies bounded recovery authority; retain its evidence. Otherwise observe only.
+  Preserve narrower task restrictions and paused or decision-required states.
+- Submit through the appropriate background wrapper or scheduler. Capture a real
+  submission receipt and baseline; submission is not the first healthy check.
+- Establish one actual monitor per run with persistent state, backend ID, first
+  due time and scheduling receipt/heartbeat. Resume from that record after
+  disconnection or compaction; reconcile missing/overdue schedules before action.
+  A background payload or computed interval does not prove active supervision.
 
-For remote tasks expected to exceed 5 minutes, prefer the `submit-monitor` architecture: `tmux + wrapper.sh` on the server, `ssh-session` MCP for transport, and Codex heartbeat/cron automation for supervised checks. Load `references/submit-monitor-architecture.md` when `RUN_ID`, `RUN_DIR`, `MONITOR_CMD`, `tmux`, or wrapper state files are involved.
+Read [monitoring-policy.md](references/monitoring-policy.md) for timing and evidence
+rules. Use [adaptive-monitor.md](references/adaptive-monitor.md) to integrate the
+pure timing helper [next_check.py](scripts/next_check.py); it does not submit, sleep,
+repair or schedule by itself. For Codex wakeups read
+[codex-automation.md](references/codex-automation.md) and use the available automation
+tool. Confirm that the backend can actually meet the requested cadence.
 
-## Boundaries
+## Observe and adapt
 
-- Do not run long tasks in a foreground interactive session.
-- Do not delete, overwrite, rename, restart, or resubmit critical jobs unless the user explicitly approved that action.
-- Do not auto-resubmit failed jobs. Gather forensics and ask the user.
-- For `sxyH3`, `sxyH2`, and `sxycloud1.top` hosts, use the persistent `ssh-session` MCP tools for remote checks. Do not poll with repeated raw `ssh` calls.
-- For wrapper-managed jobs, treat wrapper state files as the source of truth; `tmux` state is supporting evidence only.
-- Do not treat missing evidence as success. Mark unknowns and explain what evidence is missing.
-- Do not high-frequency poll beyond the configured early stability window.
-- Keep all commands, paths, parameters, versions, job ids, and output locations reproducible in the report.
+Apply the user's 1 min × 3, 10 min × 2, then 30 min / 1 h / 3 h / 6 h sequence,
+subject to verified whole-run progress, ETA and phase limits. Numerical defaults
+are maintained in [backoff-policy.json](references/backoff-policy.json).
+For a diagnosed, unchanged observability outage with no executable recovery,
+use the optional evidence-bearing backoff in `references/adaptive-monitor.md`;
+ordinary UNKNOWN states retain the shorter checks.
 
-## Default Workflow
+Classify explicit anomalies first, task-appropriate normal evidence second,
+otherwise unknown. A RUNNING process, growing output or zero exit code cannot
+cancel explicit failure or failed integrity/acceptance evidence. Keep log cursors
+and attempt identity so historical errors are not mistaken for new failures.
+Use [task-types.md](references/task-types.md) only for applicable task signals.
 
-1. Define the monitoring target.
-   - Record task goal, command or scheduler job id, pid if available, host, working directory, conda environment, log paths, expected outputs, and completion criteria.
-   - If the task was submitted via `submit-monitor` or an equivalent `tmux + wrapper.sh` harness, record `RUN_ID`, `RUN_DIR`, `HOST`, `MONITOR_CMD`, wrapper state paths, and `state/attempt`.
-   - If key paths or ids are missing, ask for them or discover them from local context before monitoring.
-   - If a remote task is expected to exceed 5 minutes and has not been submitted yet, prefer the `submit-monitor` architecture instead of a raw foreground remote command.
+Early events can shorten an existing deadline, never defer it or advance stable
+counts. Missing progress is not zero progress; retain known conservative timing
+caps while checking telemetry. Recovered observability starts a fresh short
+stability window. Keep unchanged normal checks quiet and deduplicate warnings.
 
-2. Establish a baseline.
-   - Capture current job state, recent log tail, output file timestamps/sizes, disk status if relevant, and environment/version clues.
-   - Choose the closest task type from `references/task-types.md`.
-   - For wrapper-managed jobs, run `MONITOR_CMD` and parse `KEY=VALUE` lines; do not infer state from free-text log grep alone.
+## Diagnose and recover
 
-3. Apply the staged backoff policy.
-   - Use `references/monitoring-policy.md` as the authority for intervals and normal/anomalous criteria.
-   - Prefer Codex heartbeat automation for thread wakeups and cron automation for detached workspace monitoring when the user asks for automatic follow-up.
+Act on the first explicit failure. Preserve logs, partial outputs and attempt
+history; establish the cause and whether a payload is still alive before recovery.
+A failed connection is not evidence that a remote job ended.
 
-4. On each check, compare against the baseline.
-   - State whether the job is running, completed, failed, or unknown.
-   - Check whether logs advanced and whether new lines contain clear error signals.
-   - Check whether expected outputs grew or checkpoints appeared.
-   - Record the next interval according to the policy.
+- OBSERVE_ONLY: localize and report without changing task state.
+- REPAIR_PREAUTHORIZED: perform a minimal evidence-supported repair within the
+  recorded scope. Persist `record_repair(...)` before its side effects; failed
+  fixes and failed submissions consume budget too. Record confirmed submission
+  with `recover(..., repair_id=...)`, preserving RUN_ID and incrementing attempt.
+- DECISION_REQUIRED: stop state-changing recovery and report the missing decision.
 
-5. On anomaly, stop interval expansion.
-   - Reset to the 1-minute stability window after any anomaly.
-   - Produce an anomaly report using `references/report-template.md`.
-   - Provide minimal repair options and a reproducible validation command, but do not perform destructive remediation without approval.
+Do not repeat an identical failed fix. Revised fixes need new evidence and budget:
+FIXED budgets retain maximum 3 per issue / 6 per logical run or stricter task limits.
+RENEWABLE budgets review after 3 per issue / 6 per current batch. Preserve diagnosis,
+progress or useful new evidence, a distinct next method and safe recovery gates,
+then record renewal before resetting only current batch counts. Keep lifetime
+counts, failed records, issue identity and tried-fix fingerprints. Continue within
+authority until acceptance; stop on stagnation, fixed caps or actual resource
+exhaustion. Renewal does not rearm frequent monitoring or prove a job ended. Deletion, input
+or key-result overwrite, scope/scientific-parameter changes, ambiguous lock cleanup
+and unapproved resource/environment changes require applicable authority. Monitoring
+never grants those permissions. For managed wrappers read
+[submit-monitor-architecture.md](references/submit-monitor-architecture.md).
 
-6. On expected completion, close out.
-   - Report completion evidence, key outputs, exit code or scheduler state, log location, and the minimal reproducibility record.
+## Accept and stop
 
-## Automation Guidance
+A terminal success triggers artifact, integrity, semantic and provenance checks.
+If any gate is missing or failed, record pending or not accepted; 100% progress is
+not completion. Stop the actual monitor only after acceptance or an explicit stop
+instruction, and notify once. If acceptance is deferred, retain its accountable
+follow-up rather than abandoning the run when payload polling ends.
 
-When the user asks to "keep watching", "check back later", "loop", "monitor automatically", or similar:
-- Use heartbeat automation for follow-up in the current thread.
-- Use cron automation for long-lived detached checks in a workspace.
-- Put only the monitoring task in the automation prompt; schedules belong in the automation fields.
-- Preserve the same normal/anomaly criteria from `references/monitoring-policy.md`.
-- Load `references/codex-automation.md` before creating or updating an automation.
-
-## References
-
-Load only what is needed. For long files, load the matching subsection rather than the entire reference.
-- `references/monitoring-policy.md` - staged backoff intervals and normal/anomaly definitions.
-- `references/task-types.md` - task-specific checks for local shell, SSH, workflow engines, schedulers, and bioinformatics outputs.
-- `references/report-template.md` - concise templates for normal checks, anomalies, and completion.
-- `references/submit-monitor-architecture.md` - remote long-job architecture using `tmux`, `wrapper.sh`, `RUN_ID`, `RUN_DIR`, and `MONITOR_CMD`.
-- `references/codex-automation.md` - mapping from loop-style monitoring to Codex heartbeat and cron automations.
+Use [report-template.md](references/report-template.md) for persistent evidence
+records, not compulsory chat output. Validation:
+`PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s <SKILL_ROOT>/scripts -p 'test_*.py'`.

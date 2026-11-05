@@ -32,3 +32,4 @@ Use this when explaining wet-lab panels to dry-lab readers. Mark simplified anal
 - Overexpression phenotype may not represent natural allele function.
 - Knockout phenotype can be background-dependent or pleiotropic.
 - Representative images without quantification and replicates are weak evidence.
+

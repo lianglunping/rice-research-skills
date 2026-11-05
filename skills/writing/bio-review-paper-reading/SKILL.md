@@ -1,6 +1,6 @@
 ---
 name: bio-review-paper-reading
-description: Deep-reading workflow for review articles, perspectives, opinions, primers, roadmaps, and field-synthesis papers in molecular biology, genomics, omics, quantitative genetics, plant breeding, rice, and bioinformatics. Use when the user asks to interpret a review PDF, reconstruct a field framework, identify route divergence, consensus, controversies, open gaps, conceptual figures, post-publication updates, research proposal seeds, or dry-run Zotero/Obsidian literature notes. Do not use for general literature retrieval, paper download, citation export, Zotero setup, or single original-paper panel audit.
+description: "Review paper reading: Deep-reading workflow for review articles, perspectives, opinions, primers, roadmaps, and field-synthesis papers in molecular biology, genomics, omics, quantitative genetics, plant breeding, rice, and bioinformatics."
 ---
 
 # Bio Review Paper Reading
@@ -14,7 +14,15 @@ Use this skill for high-level, evidence-bounded interpretation of review-type pa
 - Do not use for literature retrieval, paper download, citation management, Zotero configuration, or BibTeX export; use a search/Zotero workflow instead.
 - Do not claim that a narrative review has systematic evidence coverage.
 - Do not claim to complete a formal PRISMA systematic review unless actual search, screening, inclusion/exclusion, and extraction records are performed.
-- Do not write to Zotero or Obsidian by default. Produce dry-run write plans unless the user explicitly confirms a write action.
+- Zotero/Obsidian writes require applicable task authorization; default to dry-run plans otherwise. Reuse an existing explicit scoped write instruction without asking for the same approval again.
+
+## Note-vault integration
+
+When this task uses a configured note vault, read the guidance in
+[the Obsidian output contract](references/08_zotero_obsidian_output.md). Use the actual compatible
+local model, including `gpt-6.1-sol` or `gpt-5.6-sol`; no model service, plugin
+installation or new agent is needed merely to write Markdown. Keep note output
+proportionate, reuse existing folders and preserve the scientific evidence rules.
 
 ## Default Workflow
 
@@ -64,4 +72,9 @@ Before finalizing, verify:
 - Review-paper second-hand conclusions are not treated as primary evidence unless original papers were checked.
 - Post-publication updates are separated from original review claims.
 - Research seeds include minimum feasible path and failure risk.
-- Zotero/Obsidian output remains dry-run unless explicit user confirmation exists.
+- Zotero/Obsidian output remains dry-run unless applicable task write authorization exists.
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

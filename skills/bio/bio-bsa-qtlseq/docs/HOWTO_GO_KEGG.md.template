@@ -34,7 +34,7 @@ cut -f8 QTLseq_ci95_regions_candidate_genes.tsv | sort -u | sed 's/\.v2\.1$//' >
 2. Download Selected → _Vitis vinifera_ Genoscope.12X v2.1 → `annotation_info.txt.gz`
 3. 解压后是 TSV, 列含:
    ```
-   pacId, locusName, transcriptName, peptideName, Pfam, Panther, KOG, KEGG_ec, KEGG_Orthology,
+   pacId, locusName, transcriptName, peptideName, Pfam, Panther, KOG, KEGG_ec, KEGG_Orthology, 
    GO, Best-hit-arabi-name, arabi-symbol, arabi-defline
    ```
 
@@ -42,17 +42,17 @@ cut -f8 QTLseq_ci95_regions_candidate_genes.tsv | sort -u | sed 's/\.v2\.1$//' >
    ```r
    library(clusterProfiler)
    anno <- read.delim("annotation_info.txt", stringsAsFactors=FALSE)
-
+   
    # 构造 TERM2GENE (GO term -> gene)
    go_term2gene <- do.call(rbind, lapply(1:nrow(anno), function(i) {
      if (anno$GO[i] == "") return(NULL)
      gos <- strsplit(anno$GO[i], ",")[[1]]
      data.frame(term=gos, gene=anno$locusName[i])
    }))
-
+   
    # 读候选基因
    candidates <- readLines("chr5_qtl6_genes.txt")
-
+   
    # 富集
    ego <- enricher(candidates, TERM2GENE=go_term2gene, pvalueCutoff=0.05)
    head(ego@result)

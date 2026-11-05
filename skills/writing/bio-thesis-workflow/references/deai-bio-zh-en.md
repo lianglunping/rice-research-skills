@@ -2,6 +2,8 @@
 
 Use this module when the user wants cleaner academic prose without changing the evidence payload.
 
+For an explicitly requested Cell/Nature/Science or CNS/high-impact manuscript adaptation, retain this module for phrase cleanup and load `cns-empirical-writing.md` for structural adaptation. Do not imitate superficial journal mannerisms, paper-specific phrasing, or sentence rhythms; improve information order and evidence calibration instead.
+
 ## Preserve First
 
 Never rewrite or alter:
@@ -78,6 +80,12 @@ Do not auto-delete these when they are followed by real evidence:
 - "Evidence suggests"
 
 The issue is not the phrase itself. The issue is unsupported filler.
+
+## Structural Boundary
+
+- Phrase cleanup can remove filler and repetitive transitions.
+- Structural journal adaptation belongs to `cns-empirical-writing.md` only when its activation rule is met.
+- Never use superficial imitation, copied wording, or cargo-cult short sentences as a substitute for evidence-led organization.
 
 ## Output Modes
 

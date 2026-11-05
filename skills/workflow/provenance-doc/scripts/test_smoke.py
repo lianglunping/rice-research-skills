@@ -22,9 +22,9 @@ SCRIPTS_DIR = SKILL_DIR / "scripts"
 # ---------------------------------------------------------------------------
 
 def _run_script(script: Path, *args: str) -> tuple[int, str]:
-    """Run a script via uv and return (exit_code, combined_output)."""
+    """Run a script in the selected Python environment and return (exit_code, combined_output)."""
     r = subprocess.run(
-        ["uv", "run", str(script), *args],
+        [sys.executable, str(script), *args],
         capture_output=True,
         text=True,
     )
@@ -32,9 +32,9 @@ def _run_script(script: Path, *args: str) -> tuple[int, str]:
 
 
 def _run_py(code: str) -> tuple[int, str]:
-    """Run inline Python via uv."""
+    """Run inline Python in the selected environment."""
     r = subprocess.run(
-        ["uv", "run", "--with", "pyyaml", "python3", "-c", code],
+        [sys.executable, "-c", code],
         capture_output=True,
         text=True,
     )
@@ -117,7 +117,7 @@ class TestCommon(unittest.TestCase):
         """)
         script_file = _write_tmp(py_script, suffix=".py")
         r = subprocess.run(
-            ["uv", "run", "--with", "pyyaml", "python3", str(script_file)],
+            [sys.executable, str(script_file)],
             capture_output=True, text=True,
         )
         tmp.unlink(missing_ok=True)
@@ -677,7 +677,7 @@ class TestVerifyClaims(unittest.TestCase):
         ])
         # Pipe empty stdin → non-interactive → confirm_remote returns False
         r = subprocess.run(
-            ["uv", "run", str(VERIFY_CLAIMS), "--doc", str(doc)],
+            [sys.executable, str(VERIFY_CLAIMS), "--doc", str(doc)],
             capture_output=True, text=True,
             input="",  # empty stdin, not a tty
         )
@@ -873,7 +873,7 @@ class TestEdgeCasesAdditional(unittest.TestCase):
         try:
             # render_doc via CLI — sealed doc should be a no-op (exit 0) without modifying
             result = subprocess.run(
-                ["uv", "run", "--with", "pyyaml",
+                [sys.executable,
                  str(SCRIPT_DIR / "render_doc.py"), "--doc", str(prov)],
                 capture_output=True, text=True,
             )

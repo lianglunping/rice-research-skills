@@ -56,3 +56,4 @@ Hard rules:
 - Never pretend a patch was applied.
 - If the target file exists and structure is unknown, prefer `append_section` or emit conflict.
 - Separate frontmatter patch preview from body patch preview.
+

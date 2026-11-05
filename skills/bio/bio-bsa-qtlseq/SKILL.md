@@ -1,11 +1,6 @@
 ---
 name: bio-bsa-qtlseq
-description: |
-  BSA (Bulk Segregant Analysis) 全流程 skill，基于 QTLseqr + DeepVariant 的
-  v2.1 审计通过流程。自动触发于: "BSA", "QTLseqr", "QTL-seq", "G'",
-  "bulk segregant", "混池分析", "混池重测序", "极端表型", "F2 分离群体定位",
-  "抗旱 QTL", "抗病 QTL" 等场景。提供 contract-first 4-gate 流程、
-  species profile overlay、50 项审计经验索引、完整交付包打包。
+description: "BSA/QTL-seq analysis of contrasting bulks with phenotype design, pooled allele evidence, window summaries and candidate-region validation."
 license: MIT
 ---
 
@@ -147,3 +142,8 @@ ls release/grape_BSA_*_release_v2.1.tar.gz
 - **Pipeline version**: v2.1_fixed
 - **Based on**: 葡萄 5h+3h BSA 项目两轮审计经验
 - **Contract frozen**: 2026-04-18 (Team design debate 3 rounds)
+
+## Scope notes
+
+Before choosing inputs, comparison units or conclusion thresholds, read
+[the scientific scope notes](references/scope-notes.md) for this task.

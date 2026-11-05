@@ -1,6 +1,6 @@
 ---
 name: variant-primer-design
-description: This skill should be used when the user asks to design SNP or InDel PCR primers from variant tables, batch-design validation amplicon primers against an arbitrary reference genome, screen primer specificity with BLAST, redesign failed or non-specific primer pairs, or build a reusable primer-design workflow for frequent wet-lab validation work. It currently supports SNP/InDel amplification primer design with BLAST specificity screening, and does not yet implement KASP, dCAPS, targeted enrichment, or long-amplicon third-generation sequencing primer schemes.
+description: "SNP/InDel validation primer design against a specified reference, with variant normalization, flanking sequence checks and BLAST specificity assessment."
 ---
 
 # Variant Primer Design

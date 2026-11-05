@@ -36,7 +36,7 @@ check "1/10 MANIFEST.md5 覆盖所有文件" check_manifest
 
 # === Check 2: 无内部路径残留 ===
 check_no_hardcode() {
-    ! grep -rn 'sxyH3\|/home/[a-z0-9]*/\|conda activate ngs' --include='*.md' --include='*.sh' --include='*.py' --include='*.R' --include='*.yml' --include='*.yaml' .
+    ! grep -rn 'REPLACE_HOST\|/home/[a-z0-9]*/\|conda activate ngs' --include='*.md' --include='*.sh' --include='*.py' --include='*.R' --include='*.yml' --include='*.yaml' .
 }
 check "2/10 无硬编码服务器路径" check_no_hardcode
 
