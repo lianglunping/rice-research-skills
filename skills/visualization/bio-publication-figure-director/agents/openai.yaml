@@ -1,0 +1,4 @@
+interface:
+  display_name: "生信论文绘图总控"
+  short_description: "面向水稻遗传育种、生物信息学与组学论文的证据驱动投稿级绘图总控"
+  default_prompt: "使用 $bio-publication-figure-director 根据我的科研问题和数据路径，选择 ADVISE、AUDIT 或 BUILD 模式并完成可追溯的投稿级图稿。"

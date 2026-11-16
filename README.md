@@ -6,7 +6,8 @@
 
 `rice-research-skills` 是一个面向水稻分子育种、生物信息学、重离子诱变研究、科研写作和可复现分析流程的 Codex skills 集合。它来自本地长期科研工作流的筛选整理，保留了对实际任务有复用价值的技能，并排除了系统 skill、插件缓存、临时测试目录、运行缓存和机器特异性生成文件。
 
-本次更新（2026-11-05）保留现有 49 个技能目录，更新指定源中可找到的 48 个技能。
+仓库现含 50 个技能目录，新增[生物学论文绘图总控](skills/visualization/bio-publication-figure-director/SKILL.md)，
+统一科学证据、最终尺寸、排版与图件验收。
 服务器、客户和个人笔记库位置已改为调用者提供的配置；缺失的上游高级学术组件及
 `project-audit` 保留情况见 [依赖与快照范围](docs/DEPENDENCIES.md)。
 
@@ -50,6 +51,15 @@ cp -R skills/bio/* ~/.codex/skills/
 cp -R skills/writing/* ~/.codex/skills/
 ```
 
+绘图工作流及三项配套技能可一起安装：
+
+```bash
+cp -R skills/visualization/bio-publication-figure-director \
+      skills/visualization/bio-data-visualization-ggplot2-fundamentals \
+      skills/visualization/bio-data-visualization-multipanel-figures \
+      skills/visualization/bio-reporting-figure-export ~/.codex/skills/
+```
+
 安装全部 skill：
 
 ```bash
@@ -66,6 +76,7 @@ find skills -mindepth 2 -maxdepth 2 -type d -exec cp -R {} ~/.codex/skills/ \;
 帮我为这个 InDel 设计 PCR 验证引物，并检查 BLAST 特异性。
 请审计这个 BSA/QTL-seq 项目的结果是否可复现。
 帮我把这篇水稻突变体论文做主图驱动的精读。
+用 bio-publication-figure-director 按最终版面尺寸绘制两组田间表型并保留独立 panel。
 请根据这些结果写一份克制、可追溯的实验总结。
 ```
 
@@ -113,8 +124,10 @@ bash scripts/test_skills.sh
 
 `rice-research-skills` is a curated collection of Codex skills for rice molecular breeding, bioinformatics, heavy-ion mutagenesis research, scientific writing, and reproducible analysis workflows. It is a selected public snapshot of local research workflows, with system skills, plugin caches, temporary test folders, runtime caches, and machine-specific generated files intentionally excluded.
 
-The 2026-11-05 snapshot retains 49 skill directories and refreshes the 48
-available in the selected source. Host/customer paths and personal vault
+The collection contains 50 skill directories. The
+[publication figure director](skills/visualization/bio-publication-figure-director/SKILL.md)
+coordinates scientific evidence, final-size plotting and figure checks.
+Host/customer paths and personal vault
 configuration are replaced with caller-provided inputs. See
 [dependency and validation scope](docs/DEPENDENCIES.md), including retained
 `project-audit` and optional upstream ARS requirements.
@@ -157,6 +170,15 @@ Install a group of skills:
 ```bash
 cp -R skills/bio/* ~/.codex/skills/
 cp -R skills/writing/* ~/.codex/skills/
+```
+
+Install the figure director with the three companion skills:
+
+```bash
+cp -R skills/visualization/bio-publication-figure-director \
+      skills/visualization/bio-data-visualization-ggplot2-fundamentals \
+      skills/visualization/bio-data-visualization-multipanel-figures \
+      skills/visualization/bio-reporting-figure-export ~/.codex/skills/
 ```
 
 Install all skills:

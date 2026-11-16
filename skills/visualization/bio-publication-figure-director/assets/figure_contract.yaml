@@ -1,0 +1,52 @@
+figure_id: "fig1_main"
+core_question: ""
+core_claim: ""
+claim_status: "observed"
+target:
+  document: "manuscript"
+  journal: ""
+  width_mm: null
+  height_mm: null
+  text_language: "English"
+backend: "R"
+source_data:
+  - path: ""
+    role: ""
+    checksum: ""
+derived_data:
+  - path: ""
+    generated_by: ""
+entry_command: ""
+population:
+  material: ""
+  generation: ""
+  sample_ids: ""
+  selection_history: ""
+denominator: ""
+genome_contract:
+  reference: ""
+  annotation: ""
+  coordinate_basis: ""
+  contig_style: ""
+  strand: ""
+  ref_alt_definition: ""
+panels:
+  - id: "A"
+    type: ""
+    defends: ""
+    source: ""
+    editable_output: ""
+hero_panel: null
+core_panels: ["A"]
+stats_on_figure:
+  effect: ""
+  uncertainty: ""
+  sample_size: ""
+  test: ""
+  correction: ""
+export:
+  formats: ["pdf", "png"]
+  dpi: 300
+  font_policy: "target journal or project specification"
+limitations:
+  - ""

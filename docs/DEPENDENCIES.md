@@ -2,8 +2,8 @@
 
 ## Included / 本次包含
 
-This snapshot keeps the existing 49 skill directories and category layout.
-48 directories were refreshed from the selected local Codex skill collection,
+This collection contains 50 skill directories in its existing categories. The
+previous snapshot refreshed 48 directories from the selected local Codex skill collection,
 including its nested academic-writing skills, then sanitized for publication.
 `project-audit` was absent from that selected source, so its existing public
 snapshot is retained. No additional installed skills are implicitly published.
@@ -14,7 +14,7 @@ including downstream dynamic-evidence checks. Install that suite separately if
 you need its runtime policy, model-routing helper or three-stage state machine.
 The collection does not activate the three-stage workflow merely by being installed.
 
-本次保留原有 49 个技能目录和分类，更新指定源中可找到的 48 个技能并进行脱敏。
+现有 50 个技能目录，沿用原有分类。前一版从指定源更新 48 个技能并进行脱敏。
 `project-audit` 在指定源中不存在，保留仓库原有公开快照。阶段执行协议复用已发布的
 通用配套修正；需要其运行策略和模型路由时，另行安装上面链接的三阶段套件。
 
@@ -47,14 +47,33 @@ schema, silently accepting a passport or claiming that its gate passed.
 部分高级学术编排功能依赖上游 ARS schema、适配器或设计规范，指定源并未包含它们。
 启用相关功能前必须补齐并核验匹配组件；缺失时报告具体缺口，不将结构声明视为验收通过。
 
+## Publication figures / 投稿图件
+
+The figure director's R theme uses ggplot2. Export uses grDevices for PDF
+and ragg for PNG. patchwork is optional for assembly. Its Python helper
+uses Matplotlib. Install the chosen plotting stack and font in the caller's
+environment. Check the rendered size and embedded font with the actual PDF
+device available to you. The R synthetic rendering example uses patchwork
+and systemfonts to check the font. FigureYa, scipilot, Icarus and
+academic-figure-skill are optional external references distributed under
+their own licenses. See [upstream resources](../skills/visualization/bio-publication-figure-director/references/upstream-resources.md).
+
+R 样式使用 ggplot2；由 grDevices 和 ragg 分别导出 PDF 和 PNG，可用 patchwork 拼图。
+Python 使用 Matplotlib。请在作图环境中准备所需字体与设备，再检查实际成图属性。可选上游
+绘图程序及资产由调用者按需取得，并分别遵守其许可。
+
 ## Validation environment / 验证环境
 
 `validate_skills.sh` uses Bash and Python's standard library for metadata, source
 syntax and local-link checks. `test_skills.sh` runs shipped synthetic/unit tests
-for monitoring, provenance and primer helpers; install BLAST+ (`blastn` and
+for monitoring, provenance, primer and Python figure helpers; install BLAST+ (`blastn` and
 `makeblastdb`) and `requirements-test.txt`
 in a project-local environment. The primer end-to-end test runs BLAST on a synthetic reference, never on research
-inputs. Workflow-specific R, sequencing tools, reference databases,
+inputs. To check the optional R figure example, render it with
+`Rscript skills/visualization/bio-publication-figure-director/tests/render_publication_style.R <existing-output-dir>`
+and set `FIGURE_R_ARTIFACT_DIR` to that directory while running the tests.
+The R script accepts `FIGURE_TEST_PDF_DEVICE=quartz` on macOS and
+`FIGURE_TEST_FONT` for a chosen installed font. Workflow-specific R, sequencing tools, reference databases,
 Pandoc/LaTeX and optional integrations are validated in the caller's own run.
 
 The legacy provenance end-to-end shell examples require `uv` and use temporary

@@ -1,0 +1,3 @@
+# Scientific scope and usage context
+
+Plan, build, redesign, or audit traceable publication-grade biological figures from claim and source data through chart selection, composition, reproducible implementation, visual QA, and delivery. Use for rice genetics and breeding, heavy-ion mutagenesis, genomics, bioinformatics, omics, GWAS, haplotype, variants, field phenotypes, thesis or manuscript figures, multi-panel figures, journal submission, 论文配图, 科研绘图, 图怎么画, 图型选择, 图稿优化, and 图稿质检. Use relevant specialist skills and optional upstream references while keeping claims within evidence. Do not trigger for ordinary photo editing, decorative illustration, website graphics, or presentation styling without scientific data or claims.

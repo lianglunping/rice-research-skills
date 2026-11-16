@@ -81,29 +81,13 @@ ggplot(df, aes(x, y, alpha = value)) + geom_point()
 
 ## Publication Theme
 
-**Goal:** Define a reusable ggplot2 theme with clean, journal-ready styling.
-
-**Approach:** Extend theme_bw with removed grid lines, black axis elements, and clean strip labels for a consistent publication appearance.
+Use the [shared publication style](../bio-publication-figure-director/references/publication-style.md) to set final physical dimensions, typography and strokes. Set `director_root` to the installed directory of `bio-publication-figure-director`.
 
 ```r
-theme_publication <- function(base_size = 12) {
-    theme_bw(base_size = base_size) +
-    theme(
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_rect(color = 'black', linewidth = 0.5),
-        axis.text = element_text(color = 'black'),
-        axis.ticks = element_line(color = 'black'),
-        legend.key = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face = 'bold')
-    )
-}
-
-# Usage
-ggplot(df, aes(x, y)) +
+source(file.path(director_root, "scripts", "publication_style.R"))
+p <- ggplot(df, aes(x, y)) +
     geom_point() +
-    theme_publication()
+    publication_theme()
 ```
 
 ## Color Palettes
@@ -232,14 +216,12 @@ p1 + p2 + p3
 
 ## Saving Figures
 
-```r
-# For publication (300 DPI)
-ggsave('figure.pdf', p, width = 7, height = 5, units = 'in')
-ggsave('figure.png', p, width = 7, height = 5, units = 'in', dpi = 300)
-ggsave('figure.tiff', p, width = 7, height = 5, units = 'in', dpi = 300, compression = 'lzw')
+Set the width and height in millimetres for the intended use. Open both exports
+at that size and verify labels, clipping and PDF editability.
 
-# For presentations
-ggsave('figure.png', p, width = 10, height = 6, dpi = 150)
+```r
+save_publication_figure(p, "figure.pdf", 85, 60)
+save_publication_figure(p, "figure.png", 85, 60)
 ```
 
 ## Axis Formatting

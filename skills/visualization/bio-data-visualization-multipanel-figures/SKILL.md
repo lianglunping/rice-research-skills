@@ -23,6 +23,12 @@ package and adapt the example to match the actual API rather than retrying.
 - R: `patchwork::wrap_plots()`, `cowplot::plot_grid()`
 - Python: `matplotlib.pyplot.subplots()`, `fig.add_subplot()`
 
+Use the [shared publication style](../bio-publication-figure-director/references/publication-style.md)
+for the intended page size. Compose statistical plots as editable vector objects
+and retain each panel's generation source and editable export. Equal-width
+panels suit equal-weight comparisons. When resizing photos or micrographs,
+scale the image and its scale bar together and check raster DPI at placement size.
+
 ## patchwork Basics
 
 ```r
@@ -57,7 +63,7 @@ p1 / p2 / p3
     tag_levels = 'A',
     tag_prefix = '(',
     tag_suffix = ')',
-    theme = theme(plot.tag = element_text(face = 'bold', size = 14))
+    theme = theme(plot.tag = element_text(face = 'bold', size = 9))
 )
 ```
 
@@ -114,10 +120,10 @@ p1 +
 library(cowplot)
 
 # Simple grid
-plot_grid(p1, p2, p3, ncol = 3, labels = 'AUTO')
+plot_grid(p1, p2, p3, ncol = 3, labels = 'AUTO', label_size = 9)
 
 # With labels
-plot_grid(p1, p2, labels = c('A', 'B'), label_size = 14)
+plot_grid(p1, p2, labels = c('A', 'B'), label_size = 9)
 
 # Relative widths
 plot_grid(p1, p2, rel_widths = c(2, 1))
@@ -125,7 +131,7 @@ plot_grid(p1, p2, rel_widths = c(2, 1))
 # Nested grids
 top_row <- plot_grid(p1, p2, ncol = 2)
 bottom_row <- p3
-plot_grid(top_row, bottom_row, nrow = 2, labels = c('', 'C'))
+plot_grid(top_row, bottom_row, nrow = 2, labels = c('', 'C'), label_size = 9)
 ```
 
 ## Shared Axes
@@ -137,7 +143,7 @@ library(patchwork)
 (p1 + p2) & xlim(0, 10) & ylim(0, 100)
 
 # Same theme
-(p1 + p2 + p3) & theme_minimal()
+(p1 + p2 + p3) & publication_theme()
 
 # Same color scale
 (p1 + p2) & scale_color_viridis_d()
@@ -166,56 +172,27 @@ p1 + p2 + p3 + plot_layout(design = layout)
         subtitle = 'Subtitle text',
         caption = 'Data source: ...',
         theme = theme(
-            plot.title = element_text(face = 'bold', size = 16),
-            plot.subtitle = element_text(size = 12, color = 'grey40')
+            plot.title = element_text(face = 'bold', size = 8),
+            plot.subtitle = element_text(size = 8, color = 'grey40')
         )
     )
 ```
 
 ## Saving Multi-Panel Figures
 
-```r
-# Combine and save
-combined <- (p1 | p2) / (p3 | p4) +
-    plot_annotation(tag_levels = 'A') &
-    theme(plot.tag = element_text(face = 'bold'))
-
-ggsave('figure.pdf', combined, width = 10, height = 8)
-ggsave('figure.png', combined, width = 10, height = 8, dpi = 300)
-
-# For specific journal dimensions
-ggsave('figure.pdf', combined, width = 180, height = 150, units = 'mm')
-```
-
-## Complex Publication Figure
-
-**Goal:** Assemble a complete multi-panel figure combining volcano, PCA, heatmap, and boxplot panels with consistent theming.
-
-**Approach:** Create individual themed ggplot objects, arrange with patchwork operators (| for horizontal, / for vertical), add panel labels, collect shared legends, and export at journal-specified dimensions.
+In this example a 175 × 65 mm canvas contains two equal-weight panels. Set
+`director_root` to the installed directory of `bio-publication-figure-director`.
 
 ```r
-# Create themed plots
-theme_pub <- theme_bw(base_size = 10) +
-    theme(
-        panel.grid = element_blank(),
-        legend.position = 'none'
-    )
+source(file.path(director_root, "scripts", "publication_style.R"))
+p1 <- p1 + publication_theme()
+p2 <- p2 + publication_theme()
+combined <- (p1 | p2) + plot_annotation(tag_levels = "A")
 
-p_volcano <- create_volcano(res) + theme_pub + ggtitle('Volcano Plot')
-p_pca <- create_pca(vsd) + theme_pub + ggtitle('PCA')
-p_heatmap <- wrap_elements(pheatmap_grob)
-p_boxplot <- create_boxplot(expr_df) + theme_pub + ggtitle('Expression')
-
-# Assemble
-figure <- (p_volcano | p_pca) / (p_heatmap | p_boxplot) +
-    plot_annotation(tag_levels = 'A') +
-    plot_layout(guides = 'collect') &
-    theme(
-        plot.tag = element_text(face = 'bold', size = 12),
-        legend.position = 'bottom'
-    )
-
-ggsave('Figure1.pdf', figure, width = 180, height = 160, units = 'mm')
+save_publication_figure(p1, "figure1_a.pdf", 85, 65)
+save_publication_figure(p2, "figure1_b.pdf", 85, 65)
+save_publication_figure(combined, "figure1.pdf", 175, 65)
+save_publication_figure(combined, "figure1.png", 175, 65)
 ```
 
 ## matplotlib GridSpec (Python)
@@ -224,7 +201,7 @@ ggsave('Figure1.pdf', figure, width = 180, height = 160, units = 'mm')
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-fig = plt.figure(figsize=(12, 8))
+fig = plt.figure(figsize=(175 / 25.4, 100 / 25.4), layout='constrained')
 gs = GridSpec(2, 3, figure=fig)
 
 ax1 = fig.add_subplot(gs[0, 0])    # Top left
@@ -236,7 +213,6 @@ ax1.plot(x, y)
 ax2.scatter(x, y)
 ax3.bar(x, y)
 
-plt.tight_layout()
 ```
 
 ## matplotlib Panel Labels
@@ -244,15 +220,14 @@ plt.tight_layout()
 ```python
 # Add panel labels
 for ax, label in zip([ax1, ax2, ax3], ['A', 'B', 'C']):
-    ax.text(-0.1, 1.1, label, transform=ax.transAxes,
-            fontsize=14, fontweight='bold', va='top')
+    ax.set_title(label, loc='left', fontsize=9, fontweight='bold')
 ```
 
 ## matplotlib Subfigures
 
 ```python
 # matplotlib 3.4+ subfigures for complex layouts
-fig = plt.figure(figsize=(12, 8))
+fig = plt.figure(figsize=(175 / 25.4, 100 / 25.4), layout='constrained')
 subfigs = fig.subfigures(1, 2, width_ratios=[2, 1])
 
 axs_left = subfigs[0].subplots(2, 1)
@@ -261,10 +236,14 @@ ax_right = subfigs[1].subplots(1, 1)
 
 ## Publication Export
 
+Make the director's `scripts/` importable and use `matplotlib.rc_context(publication_rc())`
+around both plotting and saving.
+
 ```python
-# Python
-fig.savefig('figure1.pdf', bbox_inches='tight')
-fig.savefig('figure1.png', dpi=300, bbox_inches='tight')
+from publication_style import save_publication_figure
+
+save_publication_figure(fig, 'figure1.pdf', 175, 100)
+save_publication_figure(fig, 'figure1.png', 175, 100)
 ```
 
 ## Related Skills

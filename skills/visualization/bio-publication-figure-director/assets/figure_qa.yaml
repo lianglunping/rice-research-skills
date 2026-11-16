@@ -1,0 +1,33 @@
+figure_id: "fig1_main"
+mechanical:
+  command: ""
+  result: "pending"
+  report: ""
+semantic:
+  claim_matches_evidence: false
+  denominators_visible: false
+  claim_status_preserved: false
+scientific:
+  sample_and_material_contract_checked: false
+  genome_contract_checked_or_not_applicable: false
+  validation_boundary_explicit: false
+visual:
+  caption_cover_test: false
+  panel_drop_test: false
+  grayscale_legible: false
+  final_size_legible: false
+  page_dimensions_checked: false
+  editable_elements_checked_or_not_applicable: false
+  effective_raster_dpi_checked_or_not_applicable: false
+  panel_sources_checked_or_not_applicable: false
+  no_clipping_or_overlap: false
+four_axes:
+  depth: "pending"
+  elegance: "pending"
+  unimpeachable: "pending"
+  readability: "pending"
+status: "pending"
+reviewer: ""
+reviewed_at: ""
+notes:
+  - ""

@@ -19,87 +19,42 @@ package and adapt the example to match the actual API rather than retrying.
 
 # Publication-Ready Figure Export
 
-**"Export figures for publication"** → Save plots as high-resolution PDF/SVG/TIFF with journal-required DPI and dimensions.
-- Python: `fig.savefig('fig.pdf', dpi=300, bbox_inches='tight')`
-- R: `ggsave('fig.pdf', width=7, height=5, units='in')`
+Fix the final width and height before plotting. Follow journal or project
+requirements, using the [shared publication style](../bio-publication-figure-director/references/publication-style.md)
+for general defaults. The standard is Arial with 9 pt bold panel tags, 8 pt
+axis titles, legends and ordinary annotations, and 7 pt axis tick labels. Axis,
+curve and error-bar widths are 0.75, 1 and 0.75 pt, respectively.
 
-## Python (matplotlib)
+## PDF and PNG
 
-```python
-import matplotlib.pyplot as plt
+Export line art and statistical figures as editable PDF. Use a 300 DPI PNG for
+preview or when a raster submission is needed. Use `save_publication_figure`
+from the director's [R](../bio-publication-figure-director/scripts/publication_style.R)
+or [Python](../bio-publication-figure-director/scripts/publication_style.py)
+helper, with explicit dimensions in mm. In Python apply `publication_rc()` via
+`matplotlib.rc_context()` when creating and saving the plot. In R apply
+`publication_theme()` plus explicit linewidths on data layers. Assign margins
+within the requested canvas so cropping does not change page dimensions.
 
-# Set publication defaults
-plt.rcParams.update({
-    'font.size': 8,
-    'font.family': 'Arial',
-    'axes.linewidth': 0.5,
-    'lines.linewidth': 1,
-    'figure.dpi': 300
-})
+When a journal requests TIFF, use its image-mode and compression requirements.
+For R plots with the shared font and line settings, render with an appropriate
+final-size TIFF device, such as `ragg::agg_tiff`, and verify the file.
 
-fig, ax = plt.subplots(figsize=(3.5, 3))  # Single column width
-# ... create plot ...
+## Final artifact checks
 
-# Save in multiple formats
-fig.savefig('figure1.pdf', bbox_inches='tight', dpi=300)
-fig.savefig('figure1.png', bbox_inches='tight', dpi=300)
-fig.savefig('figure1.svg', bbox_inches='tight')
-```
-
-## R (ggplot2)
-
-```r
-library(ggplot2)
-
-p <- ggplot(data, aes(x, y)) + geom_point() +
-  theme_classic(base_size = 8) +
-  theme(text = element_text(family = 'Arial'))
-
-# PDF for vector graphics
-ggsave('figure1.pdf', p, width = 3.5, height = 3, units = 'in')
-
-# High-res PNG
-ggsave('figure1.png', p, width = 3.5, height = 3, units = 'in', dpi = 300)
-
-# TIFF (some journals require)
-ggsave('figure1.tiff', p, width = 3.5, height = 3, units = 'in',
-       dpi = 300, compression = 'lzw')
-```
-
-## Journal Requirements
-
-| Journal Type | Format | Resolution | Width |
-|--------------|--------|------------|-------|
-| Most journals | PDF/EPS | Vector | 3.5" (1-col), 7" (2-col) |
-| Online-only | PNG | 300 DPI | Variable |
-| Print | TIFF | 300-600 DPI | Column width |
-
-## Multi-panel Figures
-
-```python
-import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
-
-fig = plt.figure(figsize=(7, 5))  # Two-column width
-gs = GridSpec(2, 3, figure=fig)
-
-ax1 = fig.add_subplot(gs[0, 0])
-ax2 = fig.add_subplot(gs[0, 1:])
-ax3 = fig.add_subplot(gs[1, :])
-
-# Add panel labels
-for ax, label in zip([ax1, ax2, ax3], ['A', 'B', 'C']):
-    ax.text(-0.1, 1.1, label, transform=ax.transAxes,
-            fontsize=10, fontweight='bold')
-
-fig.savefig('figure_multipanel.pdf', bbox_inches='tight')
-```
-
-## Color Considerations
-
-- Use colorblind-friendly palettes (viridis, cividis)
-- Ensure sufficient contrast for grayscale printing
-- Maintain consistency across all figures
+- Read PDF page size and inspect embedded fonts and editable text. Inspect
+  statistical marks and lines as vectors, using the PDF object view or an
+  equivalent check. A font list alone does not establish the state of the artwork.
+- Verify pixel dimensions and stored DPI for each raster output. For each
+  embedded raster, divide its pixel dimensions by its width and height in inches
+  at final placement and use the smaller value. The containing PDF or PNG's
+  export setting cannot recover resolution lost in the original raster.
+- Open the final figure and inspect readability, overlaps, clipping and
+  missing glyphs. For multipanel figures retain the independently editable
+  statistical panels, check labels against the caption, and verify that a scale
+  bar was transformed with its image.
+- Keep categories visually distinct in grayscale or common forms of color
+  vision deficiency, and use a consistent encoding across related figures.
 
 ## Related Skills
 
